@@ -1,7 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "@/App";
-import Login from "@/routes/login.tsx";
+import AdminLayout from "@/layouts/AdminLayout";
+import Login from "@/routes/Login.tsx";
 import LoginSuccess from "@/routes/loginSuccess.tsx";
+import Dashboard from "@/routes/Dashboard";
+import Employee from "@/routes/Employee";
+// import App from "@/App";
 // import RootErrorBoundary from "@/app/ErrorBoundary";
 
 // 小工具：登录态（示例）
@@ -19,7 +22,20 @@ import LoginSuccess from "@/routes/loginSuccess.tsx";
 export const router = createBrowserRouter([
     {
         path: "/",
-        Component: App,
+        element: <AdminLayout />,
+        children: [
+            {
+                index: true,
+                element: <Dashboard />,
+                handle: { label: '工作台', icon: "dashboard" }
+            },
+            {
+                path: "employee",
+                element: <Employee />,
+                handle: { label: '员工管理', icon: "inform" }
+            }
+            // { path: "users", element: <UserList /> },
+        ],
         // ErrorBoundary: RootErrorBoundary,
     },
     {
