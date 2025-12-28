@@ -12,12 +12,8 @@ import PasswordIcon from '@mui/icons-material/LockOutlined';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Snackbar, Alert } from "@mui/material";
 import { useState } from "react";
-import { login } from "@/api/employee";
-
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/store";
-import { setToken } from "@/store/authSlice";
-
+import { loginService } from "@/services/authService";
+import { useNavigate } from "react-router-dom";
 
 
 function Login() {
@@ -38,37 +34,28 @@ function Login() {
     });
     const [loading, setLoading] = useState(false);
 
-    const dispatch = useDispatch<AppDispatch>();
-
-
+    const navigate = useNavigate();
 
     const handleClick = async () => {
         if (loading) return; // 防止连点
         setLoading(true);
 
         try {
-
             console.log('Attempting login with:', form);
 
-            const response = await login({
-                username: form.username,
-                password: form.password
-            })
-            if (String(response.code) !== '1') {
-                throw new Error(response.msg || '登录失败');
-            }
-            console.log('Login successful:', response.data);
-            dispatch(setToken(response.data.token));
+            const response = await loginService(form.username, form.password);
 
             setSnackbar({
                 open: true,
                 message:
-                    "登录成功，后端返回token：\n" +
-                    String(response.data.token),
+                    "登录成功，后端返回token：\n" + String(response.data.token),
                 type: "success",
             });
+
+            navigate("/", { replace: true });
         } catch (error) {
             console.error('Login failed:', error);
+            // 这里不应该在这里处理，应该在 axios response interceptor 处理是不是
             setSnackbar({
                 open: true,
                 message: "登录失败，显示失败原因的代码还没写",

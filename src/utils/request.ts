@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { store } from "@/store";
+import {logout} from "@/services/authService.ts";
 
 
 const http = axios.create({
@@ -15,7 +16,7 @@ http.interceptors.request.use(
         const token = store.getState().auth.token;
         if (token){
             config.headers['token'] = token;
-        } else if (config.url !== '/login') {
+        } else if (config.url !== '/employee/login') {
             window.location.href = '/login';
         }
         return config;
@@ -25,15 +26,10 @@ http.interceptors.request.use(
 
 // do just after receiving response
 http.interceptors.response.use(
-    (response) => {
-        // if (response.data.status === 401) {
-        //     这样用有问题，在组件外使用 react router 好像很麻烦？
-        //     router.push('/login')
-        // }
-        // console.log("API Response:", response);
-        return response.data;
-    },
+    (res) => res.data,
     (error) => {
+        if (error.response.data.status === 401) logout();
+
         console.error("API Error:", error);
         return Promise.reject(error);
     }

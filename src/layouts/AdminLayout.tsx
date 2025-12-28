@@ -13,8 +13,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-// import InboxIcon from '@mui/icons-material/MoveToInbox';
-// import MailIcon from '@mui/icons-material/Mail';
+import {IconButton} from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
+import {getUsername} from "@/utils/cookies.ts";
+import { logout } from "@/services/authService";
 
 const drawerWidth = 240;
 
@@ -39,7 +41,8 @@ function getAdminMenuItems() {
 
 function AdminLayout() {
     const items = React.useMemo(() => getAdminMenuItems(), []);
-    console.log('Admin menu items:', items);
+
+    const username = getUsername();
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -49,6 +52,13 @@ function AdminLayout() {
                     <Typography variant="h6" noWrap component="div">
                         苍穹外卖
                     </Typography>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Typography variant="h6" noWrap component="div">
+                        {username}
+                    </Typography>
+                    <IconButton size="large" color="inherit" onClick={logout}>
+                        <LogoutIcon />
+                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Drawer

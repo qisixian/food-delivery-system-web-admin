@@ -33,6 +33,11 @@ export const router = createBrowserRouter([
                 path: "employee",
                 element: <Employee />,
                 handle: { label: '员工管理', icon: "inform" }
+            },
+            {
+                path: "login-success",
+                element: <LoginSuccess />,
+                handle: { label: '登录测试', icon: "inform" }
             }
             // { path: "users", element: <UserList /> },
         ],
@@ -42,9 +47,5 @@ export const router = createBrowserRouter([
         path: "/login",
         Component: Login,
         // lazy: () => import("../routes/login"),
-    },
-    {
-        path: "/login-success",
-        Component: LoginSuccess,
     }
 ]);

@@ -8,4 +8,5 @@
 - [ ] Implement request deduplication / debouncing in Axios request interceptor
 - [ ] Centralize error handling in Axios response interceptor
 - [x] Write the admin layout
-- [ ] fix the auth interceptor
+- [x] fix the auth interceptor
+- [ ] Avoid full page reload on 401 response interceptor
