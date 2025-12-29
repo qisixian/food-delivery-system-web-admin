@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import AdminLayout from "@/layouts/AdminLayout";
 import Login from "@/routes/Login.tsx";
-import LoginSuccess from "@/routes/loginSuccess.tsx";
+import LoginTest from "@/routes/loginTest.tsx";
 import Dashboard from "@/routes/Dashboard";
 import Employee from "@/routes/Employee";
 // import App from "@/App";
@@ -30,14 +30,14 @@ export const router = createBrowserRouter([
                 handle: { label: '工作台', icon: "dashboard" }
             },
             {
+                path: "login-test",
+                element: <LoginTest />,
+                handle: { label: '登录测试', icon: "inform" }
+            },
+            {
                 path: "employee",
                 element: <Employee />,
                 handle: { label: '员工管理', icon: "inform" }
-            },
-            {
-                path: "login-success",
-                element: <LoginSuccess />,
-                handle: { label: '登录测试', icon: "inform" }
             }
             // { path: "users", element: <UserList /> },
         ],

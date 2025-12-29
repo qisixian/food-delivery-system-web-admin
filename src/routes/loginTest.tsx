@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {queryEmployeeById} from "@/api/employee";
 
 
-function LoginSuccess() {
+function LoginTest() {
 
     const [username, setUsername] = useState("you haven't logged in bro");
 
@@ -23,4 +23,4 @@ function LoginSuccess() {
     )
 }
 
-export default LoginSuccess
+export default LoginTest

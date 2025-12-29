@@ -17,6 +17,9 @@ import {IconButton} from "@mui/material";
 import LogoutIcon from '@mui/icons-material/Logout';
 import {getUsername} from "@/utils/cookies.ts";
 import { logout } from "@/services/authService";
+import HomeIcon from '@mui/icons-material/Home';
+import logo from '@/assets/login/logo.png';
+
 
 const drawerWidth = 240;
 
@@ -46,12 +49,27 @@ function AdminLayout() {
 
     return (
         <Box sx={{ display: 'flex' }}>
+
+
             <CssBaseline />
-            <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+
+            <AppBar
+                position="fixed"
+                elevation={0}
+                sx={{backgroundColor: "#ffc100",
+                    color: "#000",
+                    zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            >
                 <Toolbar>
-                    <Typography variant="h6" noWrap component="div">
-                        苍穹外卖
-                    </Typography>
+                    <Box
+                        component="img"
+                        src={logo}
+                        alt="苍穹外卖"
+                        sx={{
+                            height: 36,        // 控制 logo 高度
+                            width: "auto",
+                        }}
+                    />
                     <Box sx={{ flexGrow: 1 }} />
                     <Typography variant="h6" noWrap component="div">
                         {username}
@@ -59,14 +77,21 @@ function AdminLayout() {
                     <IconButton size="large" color="inherit" onClick={logout}>
                         <LogoutIcon />
                     </IconButton>
+
+
                 </Toolbar>
             </AppBar>
+
             <Drawer
                 variant="permanent"
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
-                    [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+                    [`& .MuiDrawer-paper`]: {
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        backgroundColor: "rgb(52, 55, 68)",},
+                    color: "#fff"
                 }}
             >
                 <Toolbar />
@@ -74,23 +99,47 @@ function AdminLayout() {
                     <List>
                         {items.map((item) => (
                             <ListItem key={item.label} disablePadding>
-                                <ListItemButton component={NavLink} to={item.to}>
+                                <ListItemButton
+                                    component={NavLink}
+                                    to={item.to}
+                                    sx={{
+                                        "&.active": {
+                                            backgroundColor: "rgba(255,255,255,0.12)",
+                                        },
+                                        "&:hover": {
+                                            backgroundColor: "rgba(255,255,255,0.08)",
+                                        },
+                                    }}
+                                >
                                     <ListItemIcon>
-                                        <Box
-                                            component="img"
-                                            src={`/src/assets/icons/sideBar/${item.icon}.svg`}
-                                            alt={item.label}
-                                            sx={{ width: 20, height: 20 }}
-                                        />
+                                        {/*<Box*/}
+                                        {/*    component="img"*/}
+                                        {/*    src={`/src/assets/icons/sideBar/${item.icon}.svg`}*/}
+                                        {/*    alt={item.label}*/}
+                                        {/*    sx={{ width: 20, height: 20 }}*/}
+                                        {/*/>*/}
+                                        <HomeIcon sx={{ color: "#fff" }}/>
                                     </ListItemIcon>
-                                    <ListItemText primary={item.label} />
+                                    <ListItemText primary={item.label} sx={{ color: "#fff" }}/>
                                 </ListItemButton>
                             </ListItem>
                         ))}
                     </List>
                 </Box>
             </Drawer>
-            <Outlet/>
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    p: 3,
+                }}
+            >
+                {/* 给 fixed AppBar 占位 */}
+                <Toolbar />
+
+                {/* 这里才是真正的页面内容 */}
+                <Outlet />
+            </Box>
         </Box>
     );
 }

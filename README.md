@@ -5,8 +5,9 @@
 - [x] Introduce Redux to store the auth token
 - [x] Add Axios interceptor to inject auth token
 - [x] Publish the project on GitHub
-- [ ] Implement request deduplication / debouncing in Axios request interceptor
-- [ ] Centralize error handling in Axios response interceptor
 - [x] Write the admin layout
 - [x] fix the auth interceptor
+- [ ] Implement request deduplication / debouncing in Axios request interceptor
+- [ ] Centralize error handling in Axios response interceptor
 - [ ] Avoid full page reload on 401 response interceptor
+- [ ] handle front end 404 error (no route match)
