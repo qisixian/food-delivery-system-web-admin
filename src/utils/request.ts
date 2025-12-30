@@ -28,7 +28,7 @@ http.interceptors.request.use(
 http.interceptors.response.use(
     (res) => res.data,
     (error) => {
-        if (error.response.data.status === 401) logout();
+        if (error.response.data.status === 401 || error.status === 401) logout();
 
         console.error("API Error:", error);
         return Promise.reject(error);
