@@ -9,6 +9,7 @@
 - [x] fix the auth interceptor
 - [ ] Implement request deduplication / debouncing in Axios request interceptor
 - [ ] Centralize error handling in Axios response interceptor
+- [ ] display backend error messages
 - [ ] Avoid full page reload on 401 response interceptor
 - [ ] handle 500 error
 - [ ] handle front end 404 error (no route match)

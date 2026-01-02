@@ -32,7 +32,7 @@ function getAdminMenuItems() {
     // react-router 的 router.routes 是可用的；TS 可能需要 any
     const routes = (router as any).routes as any[];
     const adminRoute = routes.find((r) => r.path === "/");
-    const children = (adminRoute?.children ?? []) as any[];
+    const children = ((adminRoute?.children ?? []) as any[]).filter((c) => c.handle.hidden !== true);
 
     return children
         .map((r) => {

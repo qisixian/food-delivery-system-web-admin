@@ -14,7 +14,11 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
-import {getEmployeeList} from "@/api/employee";
+import {
+    getEmployeeList,
+    enableOrDisableEmployee
+} from "@/api/employee";
+import {useNavigate} from "react-router-dom";
 
 
 function Employee() {
@@ -47,6 +51,8 @@ function Employee() {
         total: 0,
         rows: [],
     });
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         pageQuery();
@@ -91,6 +97,27 @@ function Employee() {
         pageQuery();
     }
 
+    const handleStartOrStop = async (id: number, status: number) => {
+        try {
+            const response = await enableOrDisableEmployee(id, status);
+            console.log("Enable/Disable employee response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            }
+        } catch (error) {
+            console.error("Failed to enable/disable employee:", error);
+        }
+    }
+
+    const handleAddEmployee = () => {
+        console.log("handleAddEmployee");
+        navigate('/employee/add');
+    }
+
+    const handleEditEmployee = (id: number) => {
+        navigate(`/employee/edit/${id}`);
+    }
+
     return (
         <>
 
@@ -112,7 +139,7 @@ function Employee() {
 
                 <Box sx={{ flexGrow: 1 }} />
 
-                <Button variant="contained">+ 添加员工</Button>
+                <Button variant="contained" onClick={handleAddEmployee}>+ 添加员工</Button>
             </Toolbar>
 
             <TableContainer component={Paper}>
@@ -138,11 +165,26 @@ function Employee() {
                                 </TableCell>
                                 <TableCell align="left">{row.username}</TableCell>
                                 <TableCell align="left">{row.phone}</TableCell>
-                                <TableCell align="left">{row.status === 0? '禁用': '启用'}</TableCell>
+                                <TableCell align="left">{row.status === 0? '🚫 禁用': '✅ 启用'}</TableCell>
                                 <TableCell align="left">{row.updateTime}</TableCell>
                                 <TableCell align="center">
-                                    <Button variant="text" sx={{p: 0}}>修改</Button>
-                                    <Button variant="text" sx={{p: 0}}>{row.status === 0? '启用': '禁用'}</Button>
+                                    <Button
+                                        variant="text"
+                                        sx={{p: 0}}
+                                        onClick={() => handleEditEmployee(row.id)}
+                                        disabled={row.username === 'admin'}
+                                    >
+                                        修改
+                                    </Button>
+                                    <Button
+                                        variant="text"
+                                        sx={{p: 0}}
+                                        onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
+                                        color={row.status === 0? 'primary': 'error'}
+                                        disabled={row.username === 'admin'}
+                                    >
+                                        {row.status === 0? '启用': '禁用'}
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}

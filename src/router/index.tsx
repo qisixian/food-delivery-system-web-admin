@@ -4,6 +4,7 @@ import Login from "@/routes/Login.tsx";
 import LoginTest from "@/routes/loginTest.tsx";
 import Dashboard from "@/routes/Dashboard";
 import Employee from "@/routes/Employee";
+import AddEmployee from "@/routes/AddEmployee.tsx";
 // import App from "@/App";
 // import RootErrorBoundary from "@/app/ErrorBoundary";
 
@@ -38,6 +39,14 @@ export const router = createBrowserRouter([
                 path: "employee",
                 element: <Employee />,
                 handle: { label: '员工管理', icon: "inform" }
+            },
+            {
+                path: "employee",
+                children: [
+                    { path: "add", element: <AddEmployee /> },
+                    { path: "edit/:id", element: <AddEmployee /> },
+                ],
+                handle: { label: '添加员工', hidden: true }
             }
             // { path: "users", element: <UserList /> },
         ],
