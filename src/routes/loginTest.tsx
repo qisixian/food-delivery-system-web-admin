@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {queryEmployeeById} from "@/api/employee";
+import Typography from "@mui/material/Typography";
 
 
 function LoginTest() {
@@ -18,7 +19,8 @@ function LoginTest() {
 
     return (
         <>
-            <h1>Username: {username}</h1>
+            <Typography variant='h4'>Login Test</Typography>
+            <Typography variant='h5' sx={{mt:2}}>Username: {username}</Typography>
         </>
     )
 }

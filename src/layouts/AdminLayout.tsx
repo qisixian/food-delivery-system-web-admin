@@ -18,15 +18,36 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import {getUsername} from "@/utils/cookies.ts";
 import { logout } from "@/services/authService";
 import HomeIcon from '@mui/icons-material/Home';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import EventNote from "@mui/icons-material/EventNote";
+import Redeem from "@mui/icons-material/Redeem";
+import RoomService from "@mui/icons-material/RoomService";
+import Apps from "@mui/icons-material/Apps";
+import Face from "@mui/icons-material/Face";
+import HelpOutlined from "@mui/icons-material/HelpOutlined";
 import logo from '@/assets/login/logo.png';
 
 
-const drawerWidth = 240;
+const drawerWidth = 225;
 
 type SidebarHandle = {
     label: string;
-    icon?: string;
+    icon: SidebarIconKey;
 };
+
+const sidebarIconMap = {
+    "dashboard": HomeIcon,
+    "statistics": AssessmentIcon,
+    "order": EventNote,
+    "setmeal": Redeem,
+    "dish": RoomService,
+    "category": Apps,
+    "employee": Face,
+    "test": HelpOutlined,
+
+} as const;
+
+type SidebarIconKey = keyof typeof sidebarIconMap;
 
 function getAdminMenuItems() {
     // react-router 的 router.routes 是可用的；TS 可能需要 any
@@ -38,7 +59,8 @@ function getAdminMenuItems() {
         .map((r) => {
             const handle = r.handle as SidebarHandle;
             const to = r.index ? "/" : `/${r.path}`;
-            return { to, label: handle.label, icon: handle.icon };
+            const Icon = handle.icon? sidebarIconMap[handle.icon]: null;
+            return { to, label: handle.label, Icon: Icon };
         });
 }
 
@@ -97,11 +119,11 @@ function AdminLayout() {
                 <Toolbar />
                 <Box sx={{ overflow: 'auto' }}>
                     <List>
-                        {items.map((item) => (
-                            <ListItem key={item.label} disablePadding>
+                        {items.map(({to, label, Icon}) => (
+                            <ListItem key={label} disablePadding>
                                 <ListItemButton
                                     component={NavLink}
-                                    to={item.to}
+                                    to={to}
                                     sx={{
                                         "&.active": {
                                             backgroundColor: "rgba(255,255,255,0.12)",
@@ -111,16 +133,20 @@ function AdminLayout() {
                                         },
                                     }}
                                 >
-                                    <ListItemIcon>
-                                        {/*<Box*/}
-                                        {/*    component="img"*/}
-                                        {/*    src={`/src/assets/icons/sideBar/${item.icon}.svg`}*/}
-                                        {/*    alt={item.label}*/}
-                                        {/*    sx={{ width: 20, height: 20 }}*/}
-                                        {/*/>*/}
-                                        <HomeIcon sx={{ color: "#fff" }}/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.label} sx={{ color: "#fff" }}/>
+                                    {Icon && (
+                                        <ListItemIcon>
+                                            <Icon sx={{ color: "#fff" }}/>
+                                        </ListItemIcon>
+                                    )}
+                                    {/*<ListItemIcon>*/}
+                                    {/*    <Box*/}
+                                    {/*        component="img"*/}
+                                    {/*        src={`/src/assets/icons/sideBar/${item.icon}.svg`}*/}
+                                    {/*        alt={item.label}*/}
+                                    {/*        sx={{ width: 20, height: 20 }}*/}
+                                    {/*    />*/}
+                                    {/*</ListItemIcon>*/}
+                                    <ListItemText primary={label} sx={{ color: "#fff" }}/>
                                 </ListItemButton>
                             </ListItem>
                         ))}

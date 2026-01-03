@@ -5,6 +5,12 @@ import LoginTest from "@/routes/loginTest.tsx";
 import Dashboard from "@/routes/Dashboard";
 import Employee from "@/routes/Employee";
 import AddEmployee from "@/routes/AddEmployee.tsx";
+import Setmeal from "@/routes/Setmeal.tsx";
+import Dish from "@/routes/Dish.tsx";
+import Category from "@/routes/Category.tsx";
+import Statistics from "@/routes/Statistics.tsx";
+import Order from "@/routes/Order.tsx";
+
 // import App from "@/App";
 // import RootErrorBoundary from "@/app/ErrorBoundary";
 
@@ -31,14 +37,39 @@ export const router = createBrowserRouter([
                 handle: { label: '工作台', icon: "dashboard" }
             },
             {
-                path: "login-test",
-                element: <LoginTest />,
-                handle: { label: '登录测试', icon: "inform" }
+                path: "statistics",
+                element: <Statistics />,
+                handle: { label: '数据统计', icon: "statistics" }
+            },
+            {
+                path: "order",
+                element: <Order />,
+                handle: { label: '订单管理', icon: "order" }
+            },
+            {
+                path: "setmeal",
+                element: <Setmeal />,
+                handle: { label: '套餐管理', icon: "setmeal" }
+            },
+            {
+                path: "dish",
+                element: <Dish />,
+                handle: { label: '菜品管理', icon: "dish" }
+            },
+            {
+                path: "category",
+                element: <Category />,
+                handle: { label: '分类管理', icon: "category" }
             },
             {
                 path: "employee",
                 element: <Employee />,
-                handle: { label: '员工管理', icon: "inform" }
+                handle: { label: '员工管理', icon: "employee" }
+            },
+            {
+                path: "login-test",
+                element: <LoginTest />,
+                handle: { label: '登录测试', icon: "test" }
             },
             {
                 path: "employee",

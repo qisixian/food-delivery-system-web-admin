@@ -1,10 +1,11 @@
+import Typography from "@mui/material/Typography";
 
 
 function Dashboard() {
 
     return (
         <>
-            <h1>DashBoard</h1>
+            <Typography variant='h4'>DashBoard</Typography>
         </>
     )
 }
