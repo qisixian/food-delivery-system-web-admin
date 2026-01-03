@@ -14,6 +14,7 @@ import { Snackbar, Alert } from "@mui/material";
 import { useState } from "react";
 import { loginService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
+import {useSnackbar} from "notistack";
 
 
 function Login() {
@@ -36,6 +37,8 @@ function Login() {
 
     const navigate = useNavigate();
 
+    const {enqueueSnackbar} = useSnackbar();
+
     const handleClick = async () => {
         if (loading) return; // 防止连点
         setLoading(true);
@@ -44,23 +47,19 @@ function Login() {
             console.log('Attempting login with:', form);
 
             const response = await loginService(form.username, form.password);
-
-            setSnackbar({
-                open: true,
-                message:
-                    "登录成功，后端返回token：\n" + String(response.data.token),
-                type: "success",
-            });
+            enqueueSnackbar(
+                "登录成功，后端返回token：" + String(response.data.token),
+                { variant: "success" }
+            );
 
             navigate("/", { replace: true });
         } catch (error) {
             console.error('Login failed:', error);
             // 这里不应该在这里处理，应该在 axios response interceptor 处理是不是
-            setSnackbar({
-                open: true,
-                message: "登录失败，显示失败原因的代码还没写",
-                type: "error",
-            });
+            enqueueSnackbar(
+                "登录失败，显示失败原因的代码还没写",
+                { variant: "error" }
+            );
         } finally{
             setLoading(false);
         }

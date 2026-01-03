@@ -7,6 +7,9 @@
 - [x] Publish the project on GitHub
 - [x] Write the admin layout
 - [x] introduce MUI theme
+- [x] introduce GlobalSnackbar
+- [ ] introduce ErrorBoundary?
+- [ ] introduce i18n
 - [x] fix the auth interceptor
 - [ ] Implement request deduplication / debouncing in Axios request interceptor
 - [ ] Centralize error handling in Axios response interceptor

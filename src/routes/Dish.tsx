@@ -16,6 +16,7 @@ import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {getDishPage} from "@/api/dish.ts";
+import { useSnackbar } from 'notistack'
 
 function Dish() {
 
@@ -34,6 +35,8 @@ function Dish() {
     });
 
     const navigate = useNavigate();
+
+    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
 
     useEffect(() => {
         pageQuery();
@@ -61,6 +64,7 @@ function Dish() {
     }
 
     const handleAddDish = () => {
+        enqueueSnackbar('I love Snackbar', { variant: "success" });
 
     }
 
