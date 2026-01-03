@@ -107,7 +107,7 @@ function Category() {
                     <Button variant="contained" onClick={handleAdd}>+ 添加套餐分类</Button>
                 </Toolbar>
 
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} elevation={0}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                         <TableHead>
                             <TableRow>
@@ -137,6 +137,7 @@ function Category() {
                                             variant="text"
                                             sx={{p: 0}}
                                             // onClick={() => handleEditEmployee(row.id)}
+                                            color='secondary'
                                         >
                                             修改
                                         </Button>
@@ -152,7 +153,7 @@ function Category() {
                                             variant="text"
                                             sx={{p: 0}}
                                             // onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
-                                            color={row.status === 0? 'primary': 'error'}
+                                            color={row.status === 0? 'secondary': 'error'}
                                         >
                                             {row.status === 0? '启用': '禁用'}
                                         </Button>
