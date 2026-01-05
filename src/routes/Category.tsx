@@ -57,13 +57,13 @@ function Category() {
 
     useEffect(() => {
         pageQuery();
-    }, []);
+    }, [pageState.page, pageState.pageSize]);
 
     const pageQuery = async () => {
         try {
             const response = await fetchCategoryPage({
-                page: 1,
-                pageSize: 10,
+                page: pageState.page + 1,
+                pageSize: pageState.pageSize,
                 name: form.name,
                 type: form.type,
             });
@@ -85,21 +85,22 @@ function Category() {
 
     }
 
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null,
+    const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null,
                               newPage: number,) => {
-        console.log("hii! handleChangePage comes! newPage:" + {newPage});
-        console.log("hii! handleChangePage comes! event:" + {event});
+        console.log("changing page to:" + newPage);
+        setPageState(prev => ({
+            ...prev,
+            page: newPage,
+        }));
     }
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log("changing rowPerPage to:", event.target.value)
-        //
-        // setPageState(prev => ({
-        //     ...prev,
-        //     pageSize: parseInt(event.target.value, 10),
-        //     page: 0,
-        // }));
-        // pageQuery();
+        setPageState(prev => ({
+            ...prev,
+            pageSize: parseInt(event.target.value, 10),
+            page: 0,
+        }));
     }
 
     return (
@@ -126,7 +127,7 @@ function Category() {
                         sx={{ minWidth: 120 }}
                         size="small"
                         select
-                        // value={value}
+                        value={form.type}
                         onChange={(e) =>
                             setForm((prev) =>
                                 ({ ...prev, type: e.target.value }))}
@@ -163,7 +164,7 @@ function Category() {
                         <TableBody>
                             {pageState.rows.map((row) => (
                                 <TableRow
-                                    key={row.username}
+                                    key={row.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">

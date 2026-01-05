@@ -60,15 +60,18 @@ function Setmeal() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        pageQuery();
         fetchCategoryOptions();
     }, []);
+
+    useEffect(() => {
+        pageQuery();
+    }, [pageState.page, pageState.pageSize]);
 
     const pageQuery = async () => {
         try {
             const response = await fetchSetmealPage({
-                page: 1,
-                pageSize: 10,
+                page: pageState.page + 1,
+                pageSize: pageState.pageSize,
                 name: form.name,
                 categoryId: form.categoryId,
                 status: form.status
@@ -104,21 +107,22 @@ function Setmeal() {
 
     }
 
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null,
+    const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null,
                               newPage: number,) => {
-        console.log("hii! handleChangePage comes! newPage:" + {newPage});
-        console.log("hii! handleChangePage comes! event:" + {event});
+        console.log("changing page to:" + newPage);
+        setPageState(prev => ({
+            ...prev,
+            page: newPage,
+        }));
     }
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log("changing rowPerPage to:", event.target.value)
-        //
-        // setPageState(prev => ({
-        //     ...prev,
-        //     pageSize: parseInt(event.target.value, 10),
-        //     page: 0,
-        // }));
-        // pageQuery();
+        setPageState(prev => ({
+            ...prev,
+            pageSize: parseInt(event.target.value, 10),
+            page: 0,
+        }));
     }
 
 
@@ -145,18 +149,18 @@ function Setmeal() {
                     <TextField
                         select
                         size="small"
-                        // value={value}
                         sx={{ minWidth: 120 }}
+                        value={form.categoryId}
                         onChange={(e) =>
                             setForm((prev) =>
                                 ({ ...prev, categoryId: e.target.value }))}
                     >
                         {categoryOptions.map((option) => (
-                            <MenuItem value={option.value}>
+                            <MenuItem key={option.value} value={option.value}>
                                 {option.label}
                             </MenuItem>
                         ))}
-                        <MenuItem value="">
+                        <MenuItem key="" value="">
                             全部
                         </MenuItem>
                     </TextField>
@@ -167,7 +171,7 @@ function Setmeal() {
                         sx={{ minWidth: 120 }}
                         size="small"
                         select
-                        // value={value}
+                        value={form.status}
                         onChange={(e) =>
                             setForm((prev) =>
                                 ({ ...prev, status: e.target.value }))}
@@ -204,7 +208,7 @@ function Setmeal() {
                         <TableBody>
                             {pageState.rows.map((row) => (
                                 <TableRow
-                                    key={row.username}
+                                    key={row.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
