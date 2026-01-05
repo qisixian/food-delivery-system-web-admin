@@ -6,7 +6,7 @@ import {ApiResponse, PageResult} from "@/types/api.ts";
  *
  **/
 // 查询列表接口
-export const getDishPage = (params: any): Promise<ApiResponse<PageResult>>  => {
+export const fetchDishPage = (params: any): Promise<ApiResponse<PageResult>>  => {
   return request({
     url: '/dish/page',
     method: 'get',
@@ -42,7 +42,7 @@ export const addDish = (params: any) => {
 }
 
 // 查询详情
-export const queryDishById = (id: string | (string | null)[]) => {
+export const queryDishById = (id: string | (string | null)[]): Promise<ApiResponse> => {
   return request({
     url: `/dish/${id}`,
     method: 'get'
@@ -80,11 +80,11 @@ export const commonDownload = (params: any) => {
 }
 
 // 起售停售---批量起售停售接口
-export const dishStatusByStatus = (params: any) => {
+export const changeDishStatus = (id: string, status: number): Promise<ApiResponse> => {
   return request({
-    url: `/dish/status/${params.status}`,
+    url: `/dish/status/${status}`,
     method: 'post',
-    params: { id: params.id }
+    params: { id: id }
   })
 }
 

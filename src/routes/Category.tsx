@@ -1,9 +1,9 @@
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getDishPage} from "@/api/dish.ts";
+import {fetchDishPage} from "@/api/dish.ts";
 import {
-    Box,
+    Box, MenuItem,
     Paper,
     Table,
     TableBody,
@@ -16,9 +16,15 @@ import {
 import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {getCategoryPage} from "@/api/category.ts";
+import {fetchCategoryPage} from "@/api/category.ts";
+import {CategoryType, Status} from "@/constants";
 
 function Category() {
+
+    const [form, setForm] = useState({
+        name: "",
+        type: "",
+    });
 
     type PageState = {
         page: number;
@@ -34,6 +40,19 @@ function Category() {
         rows: [],
     });
 
+    type Option = { value: string | number; label: string };
+
+    const categoryTypes: Option[] = [
+        {
+            value: CategoryType.Dish,
+            label: '菜品分类',
+        },
+        {
+            value: CategoryType.SetMeal,
+            label: '套餐分类',
+        },
+    ];
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,10 +61,11 @@ function Category() {
 
     const pageQuery = async () => {
         try {
-            const response = await getCategoryPage({
+            const response = await fetchCategoryPage({
                 page: 1,
                 pageSize: 10,
-                // name: form.name
+                name: form.name,
+                type: form.type,
             });
             console.log("category list response:", response);
             if (response.code === 1) {
@@ -94,11 +114,32 @@ function Category() {
                     </Typography>
                     <TextField
                         size="small"
-                        placeholder="请输入分类名称"
-                        // onChange={(e) =>
-                        //     setForm((prev) =>
-                        //         ({ ...prev, name: e.target.value }))}
+                        placeholder="按分类名称查询"
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, name: e.target.value }))}
                     />
+                    <Typography>
+                        分类类型：
+                    </Typography>
+                    <TextField
+                        sx={{ minWidth: 120 }}
+                        size="small"
+                        select
+                        // value={value}
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, type: e.target.value }))}
+                    >
+                        {categoryTypes.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem key="" value="">
+                            全部
+                        </MenuItem>
+                    </TextField>
                     <Button variant="contained" onClick={pageQuery}>查询</Button>
 
                     <Box sx={{ flexGrow: 1 }} />
@@ -128,9 +169,9 @@ function Category() {
                                     <TableCell component="th" scope="row">
                                         {row.name}
                                     </TableCell>
-                                    <TableCell align="left">{row.type}</TableCell>
+                                    <TableCell align="left">{row.type === CategoryType.Dish? '菜品分类': '套餐分类'}</TableCell>
                                     <TableCell align="left">{row.sort}</TableCell>
-                                    <TableCell align="left">{row.status === 0? '🚫 启用': '✅ 禁用'}</TableCell>
+                                    <TableCell align="left">{row.status === Status.Enabled? '✅ 启用': '🚫 禁用'}</TableCell>
                                     <TableCell align="left">{row.updateTime}</TableCell>
                                     <TableCell align="center">
                                         <Button
@@ -153,9 +194,9 @@ function Category() {
                                             variant="text"
                                             sx={{p: 0}}
                                             // onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
-                                            color={row.status === 0? 'secondary': 'error'}
+                                            color={row.status === Status.Enabled? 'error': 'secondary'}
                                         >
-                                            {row.status === 0? '启用': '禁用'}
+                                            {row.status === Status.Enabled? '禁用': '启用'}
                                         </Button>
                                     </TableCell>
                                 </TableRow>

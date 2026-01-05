@@ -47,10 +47,10 @@ function Login() {
             console.log('Attempting login with:', form);
 
             const response = await loginService(form.username, form.password);
-            enqueueSnackbar(
-                "登录成功，后端返回token：" + String(response.data.token),
-                { variant: "success" }
-            );
+            // enqueueSnackbar(
+            //     "登录成功，后端返回token：" + String(response.data.token),
+            //     { variant: "success" }
+            // );
 
             navigate("/", { replace: true });
         } catch (error) {

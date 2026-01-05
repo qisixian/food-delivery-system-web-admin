@@ -8,7 +8,7 @@ export const login = (data: any): Promise<ApiResponse> =>
         data: { ...data }
     })
 
-export const getEmployeeList = (params: any): Promise<ApiResponse<PageResult>> => {
+export const fetchEmployeeList = (params: any): Promise<ApiResponse<PageResult>> => {
     return request({
         url: '/employee/page',
         method: 'get',

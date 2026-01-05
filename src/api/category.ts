@@ -7,7 +7,7 @@ import {ApiResponse, PageResult} from "@/types/api.ts";
  **/
 
 // 查询分类列表接口
-export const getCategoryPage = (params: any): Promise<ApiResponse<PageResult>> => {
+export const fetchCategoryPage = (params: any): Promise<ApiResponse<PageResult>> => {
   return request({
     url: '/category/page',
     method: 'get',
@@ -16,7 +16,7 @@ export const getCategoryPage = (params: any): Promise<ApiResponse<PageResult>> =
 };
 
 // 删除当前列的接口
-export const deleCategory = (ids: string) => {
+export const deleteCategory = (ids: string) => {
   return request({
     url: '/category',
     method: 'delete',
@@ -43,10 +43,18 @@ export const addCategory = (params: any) => {
 };
 
 // 修改---启用禁用接口
-export const enableOrDisableEmployee = (params: any) => {
+export const enableOrDisableCategory = (params: any) => {
   return request({
     url: `/category/status/${params.status}`,
     method: 'post',
     params: { id:params.id }
   })
+}
+
+export const fetchCategoriesByType = (type: number): Promise<ApiResponse> => {
+  return request({
+    url: '/category/list',
+    method: 'get',
+    params: { type }
+  });
 }

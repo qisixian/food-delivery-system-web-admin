@@ -7,7 +7,7 @@ import {ApiResponse, PageResult} from "@/types/api.ts";
  **/
 
 // 查询列表数据
-export const getSetmealPage = (params: any): Promise<ApiResponse<PageResult>> => {
+export const fetchSetmealPage = (params: any): Promise<ApiResponse<PageResult>> => {
   return request({
     url: '/setmeal/page',
     method: 'get',

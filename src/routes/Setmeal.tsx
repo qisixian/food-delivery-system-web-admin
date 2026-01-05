@@ -1,10 +1,10 @@
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getDishPage} from "@/api/dish.ts";
+import {fetchDishPage} from "@/api/dish.ts";
 import {
-    Box,
-    Paper,
+    Box, FormControl, MenuItem,
+    Paper, Select,
     Table,
     TableBody,
     TableCell,
@@ -16,10 +16,17 @@ import {
 import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {getSetmealPage} from "@/api/setMeal.ts";
+import {fetchSetmealPage} from "@/api/setMeal.ts";
+import {CategoryType, Status} from "@/constants";
+import {fetchCategoriesByType} from "@/api/category.ts";
 
 function Setmeal() {
 
+    const [form, setForm] = useState({
+        name: "",
+        categoryId: "",
+        status: ""
+    });
 
     type PageState = {
         page: number;
@@ -35,18 +42,36 @@ function Setmeal() {
         rows: [],
     });
 
+    type Option = { value: string | number; label: string };
+
+    const [categoryOptions, setCategoryOptions] = useState<Option[]>([]);
+
+    const saleStatus: Option[] = [
+        {
+            value: Status.Enabled,
+            label: '起售',
+        },
+        {
+            value: Status.Disabled,
+            label: '停售',
+        },
+    ];
+
     const navigate = useNavigate();
 
     useEffect(() => {
         pageQuery();
+        fetchCategoryOptions();
     }, []);
 
     const pageQuery = async () => {
         try {
-            const response = await getSetmealPage({
+            const response = await fetchSetmealPage({
                 page: 1,
                 pageSize: 10,
-                // name: form.name
+                name: form.name,
+                categoryId: form.categoryId,
+                status: form.status
             });
             console.log("setmeal list response:", response);
             if (response.code === 1) {
@@ -59,6 +84,19 @@ function Setmeal() {
             }
         } catch (error) {
             console.error("Failed to fetch setmeal list:", error);
+        }
+    }
+
+    const fetchCategoryOptions = async () => {
+        try {
+            const response = await fetchCategoriesByType(CategoryType.SetMeal);
+            console.log("category list response:", response);
+            if (response.code === 1) {
+                setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
+                // console.log("pageState.rows:", pageState.rows);
+            }
+        } catch (error) {
+            console.error("Failed to fetch category list:", error);
         }
     }
 
@@ -83,6 +121,7 @@ function Setmeal() {
         // pageQuery();
     }
 
+
     return (
         <>
 
@@ -95,11 +134,53 @@ function Setmeal() {
                     </Typography>
                     <TextField
                         size="small"
-                        placeholder="请输入套餐名称"
-                        // onChange={(e) =>
-                        //     setForm((prev) =>
-                        //         ({ ...prev, name: e.target.value }))}
+                        placeholder="按套餐名称查询"
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, name: e.target.value }))}
                     />
+                    <Typography>
+                        套餐分类：
+                    </Typography>
+                    <TextField
+                        select
+                        size="small"
+                        // value={value}
+                        sx={{ minWidth: 120 }}
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, categoryId: e.target.value }))}
+                    >
+                        {categoryOptions.map((option) => (
+                            <MenuItem value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem value="">
+                            全部
+                        </MenuItem>
+                    </TextField>
+                    <Typography>
+                        售卖状态：
+                    </Typography>
+                    <TextField
+                        sx={{ minWidth: 120 }}
+                        size="small"
+                        select
+                        // value={value}
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, status: e.target.value }))}
+                    >
+                        {saleStatus.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem key="" value="">
+                            全部
+                        </MenuItem>
+                    </TextField>
                     <Button variant="contained" onClick={pageQuery}>查询</Button>
 
                     <Box sx={{ flexGrow: 1 }} />
@@ -129,8 +210,8 @@ function Setmeal() {
                                     <TableCell component="th" scope="row">
                                         {row.name}
                                     </TableCell>
-                                    <TableCell align="left">row.image</TableCell>
-                                    <TableCell align="left">{row.categoryId}</TableCell>
+                                    <TableCell align="left">image</TableCell>
+                                    <TableCell align="left">{row.categoryName}</TableCell>
                                     <TableCell align="left">¥ {row.price}</TableCell>
                                     <TableCell align="left">{row.status === 0? '🚫 停售': '✅ 起售'}</TableCell>
                                     <TableCell align="left">{row.updateTime}</TableCell>

@@ -12,10 +12,12 @@ import Button from "@mui/material/Button";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {addEmployee, editEmployee, queryEmployeeById} from "@/api/employee.ts";
+import {Gender} from "@/constants";
+
+
+const labelWidth = 100;
 
 function AddEmployee() {
-
-    const labelWidth = 100;
 
     const navigate = useNavigate();
 
@@ -36,7 +38,7 @@ function AddEmployee() {
         username: "",
         name: "",
         phone: "",
-        sex: "1",
+        sex: String(Gender.Male),
         idNumber: ""
     });
 
@@ -194,15 +196,15 @@ function AddEmployee() {
                                 row
                                 aria-labelledby="demo-radio-buttons-group-label"
                                 name="radio-buttons-group"
-                                defaultValue="1"
+                                defaultValue={Gender.Male}
                                 value={form.sex}
                                 onChange={(e) =>
                                     setForm((prev) =>
                                         ({...prev, sex: e.target.value}))
                                 }
                             >
-                                <FormControlLabel value="1" control={<Radio/>} label="男"/>
-                                <FormControlLabel value="2" control={<Radio/>} label="女"/>
+                                <FormControlLabel value={Gender.Male} control={<Radio/>} label="男"/>
+                                <FormControlLabel value={Gender.Female} control={<Radio/>} label="女"/>
                             </RadioGroup>
                         </FormControl>
                     </Stack>

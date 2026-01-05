@@ -15,10 +15,11 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {
-    getEmployeeList,
+    fetchEmployeeList,
     enableOrDisableEmployee
 } from "@/api/employee";
 import {useNavigate} from "react-router-dom";
+import {Status} from "@/constants";
 
 
 function Employee() {
@@ -60,7 +61,7 @@ function Employee() {
 
     const pageQuery = async () => {
         try {
-            const response = await getEmployeeList({
+            const response = await fetchEmployeeList({
                 page: 1,
                 pageSize: 10,
                 name: form.name
@@ -110,7 +111,6 @@ function Employee() {
     }
 
     const handleAddEmployee = () => {
-        console.log("handleAddEmployee");
         navigate('/employee/add');
     }
 
@@ -130,7 +130,7 @@ function Employee() {
                 </Typography>
                 <TextField
                     size="small"
-                    placeholder="请输入员工姓名"
+                    placeholder="按员工姓名查询"
                     onChange={(e) =>
                        setForm((prev) =>
                            ({ ...prev, name: e.target.value }))}
@@ -165,7 +165,7 @@ function Employee() {
                                 </TableCell>
                                 <TableCell align="left">{row.username}</TableCell>
                                 <TableCell align="left">{row.phone}</TableCell>
-                                <TableCell align="left">{row.status === 0? '🚫 禁用': '✅ 启用'}</TableCell>
+                                <TableCell align="left">{row.status === Status.Enabled? '✅ 启用': '🚫 禁用'}</TableCell>
                                 <TableCell align="left">{row.updateTime}</TableCell>
                                 <TableCell align="center">
                                     <Button
@@ -180,11 +180,11 @@ function Employee() {
                                     <Button
                                         variant="text"
                                         sx={{p: 0}}
-                                        onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
-                                        color={row.status === 0? 'secondary': 'error'}
+                                        onClick={() => handleStartOrStop(row.id, row.status === Status.Enabled? Status.Disabled: Status.Enabled)}
+                                        color={row.status === Status.Enabled? 'error': 'secondary'}
                                         disabled={row.username === 'admin'}
                                     >
-                                        {row.status === 0? '启用': '禁用'}
+                                        {row.status === Status.Enabled? '禁用': '启用'}
                                     </Button>
                                 </TableCell>
                             </TableRow>

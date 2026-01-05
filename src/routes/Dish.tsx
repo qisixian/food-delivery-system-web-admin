@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography";
 import {
-    Box,
+    Box, MenuItem,
     Paper,
     Table,
     TableBody,
@@ -15,10 +15,18 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getDishPage} from "@/api/dish.ts";
+import {changeDishStatus, fetchDishPage} from "@/api/dish.ts";
 import { useSnackbar } from 'notistack'
+import {fetchCategoriesByType} from "@/api/category.ts";
+import {CategoryType, Status} from "@/constants";
 
 function Dish() {
+
+    const [form, setForm] = useState({
+        name: "",
+        categoryId: "",
+        status: ""
+    });
 
     type PageState = {
         page: number;
@@ -34,20 +42,38 @@ function Dish() {
         rows: [],
     });
 
+    type Option = { value: string | number; label: string };
+
+    const [categoryOptions, setCategoryOptions] = useState<Option[]>([]);
+
+    const saleStatus: Option[] = [
+        {
+            value: Status.Enabled,
+            label: '起售',
+        },
+        {
+            value: Status.Disabled,
+            label: '停售',
+        },
+    ];
+
     const navigate = useNavigate();
 
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
 
     useEffect(() => {
         pageQuery();
+        fetchCategoryOptions();
     }, []);
 
     const pageQuery = async () => {
         try {
-            const response = await getDishPage({
+            const response = await fetchDishPage({
                 page: 1,
                 pageSize: 10,
-                // name: form.name
+                name: form.name,
+                categoryId: form.categoryId,
+                status: form.status
             });
             console.log("Dish list response:", response);
             if (response.code === 1) {
@@ -63,9 +89,39 @@ function Dish() {
         }
     }
 
-    const handleAddDish = () => {
-        enqueueSnackbar('I love Snackbar', { variant: "success" });
+    const fetchCategoryOptions = async () => {
+        try {
+            const response = await fetchCategoriesByType(CategoryType.Dish);
+            console.log("category list response:", response);
+            if (response.code === 1) {
+                setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
+                // console.log("pageState.rows:", pageState.rows);
+            }
+        } catch (error) {
+            console.error("Failed to fetch category list:", error);
+        }
+    }
 
+    const handleAddDish = () => {
+        navigate("/dish/add");
+    }
+
+    const handleEditDish = (id: number) => {
+        navigate(`/dish/edit/${id}`);
+    }
+
+    const handleDeleteDish = () => {}
+
+    const handleChangeDishStatus = async (id:string, status: number) => {
+        try {
+            const response = await changeDishStatus(id, status);
+            console.log("change dish status response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            }
+        } catch (error) {
+            console.error("Failed to change dish status:", error);
+        }
     }
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null,
@@ -97,11 +153,52 @@ function Dish() {
                     </Typography>
                     <TextField
                         size="small"
-                        placeholder="请输入菜品名称"
-                        // onChange={(e) =>
-                        //     setForm((prev) =>
-                        //         ({ ...prev, name: e.target.value }))}
+                        placeholder="按菜品名称查询"
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, name: e.target.value }))}
                     />
+                    <Typography>
+                        菜品分类：
+                    </Typography>
+                    <TextField
+                        select
+                        size="small"
+                        sx={{ minWidth: 120 }}
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, categoryId: e.target.value }))}
+                    >
+                        {categoryOptions.map((option) => (
+                            <MenuItem value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem value="">
+                            全部
+                        </MenuItem>
+                    </TextField>
+                    <Typography>
+                        售卖状态：
+                    </Typography>
+                    <TextField
+                        sx={{ minWidth: 120 }}
+                        size="small"
+                        select
+                        // value={value}
+                        onChange={(e) =>
+                            setForm((prev) =>
+                                ({ ...prev, status: e.target.value }))}
+                    >
+                        {saleStatus.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                        <MenuItem key="" value="">
+                            全部
+                        </MenuItem>
+                    </TextField>
                     <Button variant="contained" onClick={pageQuery}>查询</Button>
 
                     <Box sx={{ flexGrow: 1 }} />
@@ -131,16 +228,16 @@ function Dish() {
                                     <TableCell component="th" scope="row">
                                         {row.name}
                                     </TableCell>
-                                    <TableCell align="left">row.image</TableCell>
-                                    <TableCell align="left">{row.categoryId}</TableCell>
+                                    <TableCell align="left">image</TableCell>
+                                    <TableCell align="left">{row.categoryName}</TableCell>
                                     <TableCell align="left">¥ {row.price}</TableCell>
-                                    <TableCell align="left">{row.status === 0? '🚫 停售': '✅ 起售'}</TableCell>
+                                    <TableCell align="left">{row.status === Status.Enabled? '✅ 起售': '🚫 停售'}</TableCell>
                                     <TableCell align="left">{row.updateTime}</TableCell>
                                     <TableCell align="center">
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleEditEmployee(row.id)}
+                                            onClick={() => handleEditDish(row.id)}
                                             color='secondary'
                                         >
                                             修改
@@ -156,10 +253,10 @@ function Dish() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
-                                            color={row.status === 0? 'secondary': 'error'}
+                                            onClick={() => handleChangeDishStatus(row.id, row.status === Status.Enabled? Status.Disabled: Status.Enabled)}
+                                            color={row.status === Status.Enabled? 'error': 'secondary'}
                                         >
-                                            {row.status === 0? '起售': '停售'}
+                                            {row.status === Status.Enabled? '停售': '起售'}
                                         </Button>
                                     </TableCell>
                                 </TableRow>

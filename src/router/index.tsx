@@ -10,6 +10,7 @@ import Dish from "@/routes/Dish.tsx";
 import Category from "@/routes/Category.tsx";
 import Statistics from "@/routes/Statistics.tsx";
 import Order from "@/routes/Order.tsx";
+import AddDish from "@/routes/AddDish.tsx";
 
 // import App from "@/App";
 // import RootErrorBoundary from "@/app/ErrorBoundary";
@@ -78,6 +79,14 @@ export const router = createBrowserRouter([
                     { path: "edit/:id", element: <AddEmployee /> },
                 ],
                 handle: { label: '添加员工', hidden: true }
+            },
+            {
+                path: "dish",
+                children: [
+                    { path: "add", element: <AddDish /> },
+                    { path: "edit/:id", element: <AddDish /> },
+                ],
+                handle: { label: '添加菜品', hidden: true }
             }
             // { path: "users", element: <UserList /> },
         ],
