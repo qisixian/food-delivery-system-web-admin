@@ -1,7 +1,5 @@
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {fetchDishPage} from "@/api/dish.ts";
 import {
     Box, MenuItem,
     Paper,
@@ -21,9 +19,12 @@ import {CategoryType, Status} from "@/constants";
 
 function Category() {
 
-    const [form, setForm] = useState({
-        name: "",
-        type: "",
+    const [form, setForm] = useState<{
+        name: string;
+        type: number | ''; // // MUI uses '' to represent an unselected state
+    }>({
+        name: '',
+        type: '',
     });
 
     type PageState = {
@@ -53,7 +54,7 @@ function Category() {
         },
     ];
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
         pageQuery();
@@ -65,19 +66,20 @@ function Category() {
                 page: pageState.page + 1,
                 pageSize: pageState.pageSize,
                 name: form.name,
-                type: form.type,
+                ...(form.type !== '' ? { type: form.type } : {}),
             });
-            console.log("category list response:", response);
-            if (response.code === 1) {
+            console.log("category page response:", response);
+            if (response.code === 1 && response.data) {
+                const data = response.data;
                 setPageState(prev => ({
                     ...prev,
-                    rows: response.data.records,
-                    total: response.data.total
+                    rows: data.records,
+                    total: data.total
                 }));
                 // console.log("pageState.rows:", pageState.rows);
             }
         } catch (error) {
-            console.error("Failed to fetch category list:", error);
+            console.error("Failed to fetch category page:", error);
         }
     }
 
@@ -130,7 +132,9 @@ function Category() {
                         value={form.type}
                         onChange={(e) =>
                             setForm((prev) =>
-                                ({ ...prev, type: e.target.value }))}
+                                ({ ...prev,
+                                    type: e.target.value === '' ? '' : Number(e.target.value),
+                                }))}
                     >
                         {categoryTypes.map((option) => (
                             <MenuItem key={option.value} value={option.value}>

@@ -4,19 +4,21 @@ import { setToken, clearToken } from "@/store/authSlice";
 import {removeUsername, setUsername} from "@/utils/cookies";
 
 export async function loginService(username: string, password: string) {
-
-    const response = await login({
-        username: username,
-        password: password
-    })
-    if (String(response.code) !== '1') {
+    try{
+        const response = await login({
+            username: username,
+            password: password
+        })
+        if (response.code === 1 && response.data) {
+            console.log('Login successful:', response);
+            store.dispatch(setToken(response.data.token));
+            setUsername(response.data.name);
+            return response;
+        }
         throw new Error(response.msg || '登录失败');
+    } catch (error) {
+        console.error("Failed to login:", error);
     }
-    console.log('Login successful:', response);
-    store.dispatch(setToken(response.data.token));
-    setUsername(response.data.name);
-
-    return response;
 }
 
 export function logout() {

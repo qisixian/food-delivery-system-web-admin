@@ -1,10 +1,11 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse} from 'axios'
 import { store } from "@/store";
 import {logout} from "@/services/authService.ts";
+import {ApiResponse} from "@/types";
 
 
-const http = axios.create({
-    baseURL: "/api/admin",
+export const http = axios.create({
+    baseURL: "/api",
     'timeout': 600000
 })
 
@@ -16,7 +17,7 @@ http.interceptors.request.use(
         const token = store.getState().auth.token;
         if (token){
             config.headers['token'] = token;
-        } else if (config.url !== '/employee/login') {
+        } else if (config.url !== '/admin/employee/login') {
             window.location.href = '/login';
         }
         return config;
@@ -26,7 +27,8 @@ http.interceptors.request.use(
 
 // do just after receiving response
 http.interceptors.response.use(
-    (res) => res.data,
+    (res: AxiosResponse) => res.data,
+    // (error: AxiosError) => {
     (error) => {
         if (error.response.data.status === 401 || error.status === 401) logout();
 
@@ -35,5 +37,22 @@ http.interceptors.response.use(
     }
 );
 
+export type RequestConfig<Body = unknown, Query = unknown> =
+    Omit<AxiosRequestConfig<Body>, 'data' | 'params'> & {
+    data?: Body;
+    params?: Query;
+};
 
-export default http
+
+export default function request<Data = unknown, Body = unknown, Query = unknown>(
+    config: RequestConfig<Body, Query>
+): Promise<ApiResponse<Data>> {
+    return http.request<ApiResponse<Data>, ApiResponse<Data>, Body>(config as AxiosRequestConfig<Body>);
+}
+
+
+export function requestRaw<Res = unknown, Body = unknown, Query = unknown>(
+    config: RequestConfig<Body, Query>
+): Promise<Res> {
+    return http.request<Res, Res, Body>(config as AxiosRequestConfig<Body>);
+}

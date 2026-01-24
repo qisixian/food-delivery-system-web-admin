@@ -1,10 +1,8 @@
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {fetchDishPage} from "@/api/dish.ts";
 import {
-    Box, FormControl, MenuItem,
-    Paper, Select,
+    Box, MenuItem,
+    Paper,
     Table,
     TableBody,
     TableCell,
@@ -22,11 +20,17 @@ import {fetchCategoriesByType} from "@/api/category.ts";
 
 function Setmeal() {
 
-    const [form, setForm] = useState({
-        name: "",
-        categoryId: "",
-        status: ""
+    const [form, setForm] = useState<{
+        name: string;
+        categoryId: number | ''; // MUI uses '' to represent an unselected state
+        status: number | '';
+    }>({
+        name: '',
+        categoryId: '',
+        status: ''
     });
+
+
 
     type PageState = {
         page: number;
@@ -57,7 +61,7 @@ function Setmeal() {
         },
     ];
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
         fetchCategoryOptions();
@@ -73,15 +77,16 @@ function Setmeal() {
                 page: pageState.page + 1,
                 pageSize: pageState.pageSize,
                 name: form.name,
-                categoryId: form.categoryId,
-                status: form.status
+                ...(form.categoryId !== '' ? { categoryId: form.categoryId } : {}),
+                ...(form.status !== '' ? { status: form.status } : {}),
             });
             console.log("setmeal list response:", response);
-            if (response.code === 1) {
+            if (response.code === 1 && response.data) {
+                const data = response.data;
                 setPageState(prev => ({
                     ...prev,
-                    rows: response.data.records,
-                    total: response.data.total
+                    rows: data.records,
+                    total: data.total
                 }));
                 // console.log("pageState.rows:", pageState.rows);
             }
@@ -92,9 +97,9 @@ function Setmeal() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const response = await fetchCategoriesByType(CategoryType.SetMeal);
+            const response = await fetchCategoriesByType({type: CategoryType.SetMeal});
             console.log("category list response:", response);
-            if (response.code === 1) {
+            if (response.code === 1 && response.data) {
                 setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
                 // console.log("pageState.rows:", pageState.rows);
             }
@@ -153,7 +158,9 @@ function Setmeal() {
                         value={form.categoryId}
                         onChange={(e) =>
                             setForm((prev) =>
-                                ({ ...prev, categoryId: e.target.value }))}
+                                ({ ...prev,
+                                    categoryId: e.target.value === '' ? '' : Number(e.target.value),
+                                }))}
                     >
                         {categoryOptions.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
@@ -174,7 +181,9 @@ function Setmeal() {
                         value={form.status}
                         onChange={(e) =>
                             setForm((prev) =>
-                                ({ ...prev, status: e.target.value }))}
+                                ({ ...prev,
+                                    status: e.target.value === '' ? '' : Number(e.target.value),
+                                }))}
                     >
                         {saleStatus.map((option) => (
                             <MenuItem key={option.value} value={option.value}>

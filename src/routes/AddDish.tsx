@@ -3,16 +3,12 @@ import {
     Stack,
     Typography,
     TextField,
-    FormControl,
-    FormControlLabel,
-    Radio,
-    RadioGroup, MenuItem,
+    MenuItem,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {changeDishStatus, queryDishById} from "@/api/dish.ts";
-import {enqueueSnackbar} from "notistack";
+import {queryDishById} from "@/api/dish.ts";
 import {fetchCategoriesByType} from "@/api/category.ts";
 import {CategoryType} from "@/constants";
 
@@ -29,9 +25,9 @@ function AddDish() {
     type Form = {
         id: string;
         name: string;
-        categoryId: string;
-        price: string,
-        flavors: string[],
+        categoryId: number | '';
+        price: number | '',
+        flavors: unknown[],
         image: string;
         description: string;
     };
@@ -54,25 +50,30 @@ function AddDish() {
 
     const [errors, setErrors] = useState<Errors>({});
 
+    type Validator<T> = (value: T) => string | undefined;
+
+    type Validators<Form> = {
+        [K in keyof Form]: Validator<Form[K]>;
+    };
+
     const validators = {
         id: () => undefined,
         name: (v: string) => (!v ? "菜品名称不能为空" : undefined),
         categoryId: () => undefined,
-        price: (v: string) => {
-            if (!v) return "价格不能为空";
-            if (isNaN(Number(v))) return "价格必须为数字";
-            if (Number(v) < 0) return "价格不能为负数";
+        price: (v: number | "") => {
+            if (v === "") return "价格不能为空";
+            if (v < 0) return "价格不能为负数";
             return undefined;
         },
         flavors: () => undefined,
         image: () => undefined,
         description: () => undefined,
-    } satisfies Record<keyof Form, (v: string) => string | undefined>;
+    } satisfies Validators<Form>;
 
     useEffect(() => {
         if(isEdit){
-            queryDishById(String(id)).then(res => {
-                if (res.code===1){
+            queryDishById({id: Number(id)}).then(res => {
+                if (res.code === 1 && res.data) {
                     console.log("Fetched dish data:", res);
                     setForm({
                         id: String(id),
@@ -82,7 +83,7 @@ function AddDish() {
                         flavors: res.data.flavors,
                         image: res.data.image,
                         description: res.data.description
-                    })
+                    });
                 } else {
                     console.error("Failed to fetch dish data:", res.msg);
                 }
@@ -95,9 +96,9 @@ function AddDish() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const response = await fetchCategoriesByType(CategoryType.Dish);
+            const response = await fetchCategoriesByType({type: CategoryType.Dish});
             console.log("category list response:", response);
-            if (response.code === 1) {
+            if (response.code === 1 && response.data) {
                 setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
                 // console.log("pageState.rows:", pageState.rows);
             }
@@ -184,10 +185,10 @@ function AddDish() {
                             value={form.categoryId}
                             onChange={(e) =>
                                 setForm((prev) =>
-                                    ({ ...prev, categoryId: e.target.value }))}
+                                    ({ ...prev, categoryId: Number(e.target.value) }))}
                         >
                             {categoryOptions.map((option) => (
-                                <MenuItem value={option.value}>
+                                <MenuItem key={option.value} value={option.value}>
                                     {option.label}
                                 </MenuItem>
                             ))}
@@ -200,7 +201,7 @@ function AddDish() {
                             value={form.price}
                             onChange={(e) =>
                                 setForm((prev) =>
-                                    ({...prev, price: e.target.value}))
+                                    ({...prev, price: Number(e.target.value) }))
                             }
                             onBlur={() => {
                                 setErrors((p) => ({

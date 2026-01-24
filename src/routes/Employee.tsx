@@ -15,7 +15,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {
-    fetchEmployeeList,
+    fetchEmployeePage,
     enableOrDisableEmployee
 } from "@/api/employee";
 import {useNavigate} from "react-router-dom";
@@ -33,7 +33,7 @@ function Employee() {
         username: string;
         name: string;
         phone: string;
-        sex: number;
+        sex: string;
         idNumber: string;
         status: number;
         updateTime: string;
@@ -61,17 +61,18 @@ function Employee() {
 
     const pageQuery = async () => {
         try {
-            const response = await fetchEmployeeList({
+            const response = await fetchEmployeePage({
                 page: pageState.page + 1,
                 pageSize: pageState.pageSize,
                 name: form.name
             });
             console.log("Employee list response:", response);
-            if (response.code === 1) {
+            if (response.code === 1 && response.data) {
+                const data = response.data;
                 setPageState(prev => ({
                     ...prev,
-                    rows: response.data.records,
-                    total: response.data.total
+                    rows: data.records,
+                    total: data.total
                 }));
                 // console.log("pageState.rows:", pageState.rows);
             }
@@ -101,7 +102,7 @@ function Employee() {
 
     const handleStartOrStop = async (id: number, status: number) => {
         try {
-            const response = await enableOrDisableEmployee(id, status);
+            const response = await enableOrDisableEmployee({id, status});
             console.log("Enable/Disable employee response:", response);
             if (response.code === 1) {
                 pageQuery();

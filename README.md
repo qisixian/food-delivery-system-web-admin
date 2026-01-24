@@ -8,6 +8,7 @@
 - [x] Write the admin layout
 - [x] introduce MUI theme
 - [x] introduce GlobalSnackbar
+- [ ] introduce openapi
 - [ ] introduce ErrorBoundary?
 - [ ] introduce i18n
 - [x] fix the auth interceptor

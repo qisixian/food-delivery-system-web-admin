@@ -25,7 +25,7 @@ function AddEmployee() {
     const isEdit = Boolean(id);
 
     type Form = {
-        id: string;
+        id: number | undefined;
         username: string;
         name: string;
         phone: string;
@@ -34,7 +34,7 @@ function AddEmployee() {
     };
 
     const [form, setForm] = useState<Form>({
-        id: "",
+        id: undefined,
         username: "",
         name: "",
         phone: "",
@@ -66,10 +66,10 @@ function AddEmployee() {
 
     useEffect(() => {
         if(isEdit){
-            queryEmployeeById(String(id)).then(res => {
-                if (res.code===1){
+            queryEmployeeById({id: Number(id)}).then(res => {
+                if (res.code === 1 && res.data) {
                     setForm({
-                        id: String(id),
+                        id: Number(id),
                         username: res.data.username,
                         name: res.data.name,
                         phone: res.data.phone,

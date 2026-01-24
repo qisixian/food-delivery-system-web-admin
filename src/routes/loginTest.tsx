@@ -8,9 +8,13 @@ function LoginTest() {
     const [username, setUsername] = useState("you haven't logged in bro");
 
     useEffect(() => {
-        queryEmployeeById("1").then(response => {
-            console.log('User data:', response);
-            setUsername(response.data.username);
+        queryEmployeeById({id: 1}).then(res => {
+            if (res.code === 1 && res.data) {
+                console.log('User data:', res);
+                setUsername(res.data.username);
+            } else {
+                console.error("Failed to fetch user data:", res.msg);
+            }
         }).catch(error => {
             console.error('Failed to fetch user data:', error);
         })

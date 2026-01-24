@@ -16,16 +16,19 @@ import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {changeDishStatus, fetchDishPage} from "@/api/dish.ts";
-import { useSnackbar } from 'notistack'
 import {fetchCategoriesByType} from "@/api/category.ts";
 import {CategoryType, Status} from "@/constants";
 
 function Dish() {
 
-    const [form, setForm] = useState({
-        name: "",
-        categoryId: "",
-        status: ""
+    const [form, setForm] = useState<{
+        name: string;
+        categoryId: number | '';
+        status: number | '';
+    }>({
+        name: '',
+        categoryId: '',
+        status: ''
     });
 
     type PageState = {
@@ -59,7 +62,7 @@ function Dish() {
 
     const navigate = useNavigate();
 
-    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+    // const {enqueueSnackbar, closeSnackbar} = useSnackbar();
 
     useEffect(() => {
         fetchCategoryOptions();
@@ -75,15 +78,16 @@ function Dish() {
                 page: pageState.page + 1,
                 pageSize: pageState.pageSize,
                 name: form.name,
-                categoryId: form.categoryId,
-                status: form.status
+                ...(form.categoryId !== '' ? { categoryId: form.categoryId } : {}),
+                ...(form.status !== '' ? { status: form.status } : {}),
             });
             console.log("Dish list response:", response);
-            if (response.code === 1) {
+            if (response.code === 1 && response.data) {
+                const data = response.data;
                 setPageState(prev => ({
                     ...prev,
-                    rows: response.data.records,
-                    total: response.data.total
+                    rows: data.records,
+                    total: data.total
                 }));
                 // console.log("pageState.rows:", pageState.rows);
             }
@@ -94,9 +98,9 @@ function Dish() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const response = await fetchCategoriesByType(CategoryType.Dish);
+            const response = await fetchCategoriesByType({type: CategoryType.Dish});
             console.log("category list response:", response);
-            if (response.code === 1) {
+            if (response.code === 1 && response.data) {
                 setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
                 // console.log("pageState.rows:", pageState.rows);
             }
@@ -113,11 +117,11 @@ function Dish() {
         navigate(`/dish/edit/${id}`);
     }
 
-    const handleDeleteDish = () => {}
+    // const handleDeleteDish = () => {}
 
-    const handleChangeDishStatus = async (id:string, status: number) => {
+    const handleChangeDishStatus = async (id: number, status: number) => {
         try {
-            const response = await changeDishStatus(id, status);
+            const response = await changeDishStatus({id, status});
             console.log("change dish status response:", response);
             if (response.code === 1) {
                 pageQuery();
@@ -172,7 +176,9 @@ function Dish() {
                         value={form.categoryId}
                         onChange={(e) =>
                             setForm((prev) =>
-                                ({ ...prev, categoryId: e.target.value }))}
+                                ({ ...prev,
+                                    categoryId: e.target.value === '' ? '' : Number(e.target.value)
+                                }))}
                     >
                         {categoryOptions.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
@@ -193,7 +199,9 @@ function Dish() {
                         value={form.status}
                         onChange={(e) =>
                             setForm((prev) =>
-                                ({ ...prev, status: e.target.value }))}
+                                ({ ...prev,
+                                    status: e.target.value === '' ? '' : Number(e.target.value)
+                                }))}
                     >
                         {saleStatus.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
