@@ -16,7 +16,8 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import {fetchSetmealPage} from "@/api/setMeal.ts";
 import {CategoryType, Status} from "@/constants";
-import {fetchCategoriesByType} from "@/api/category.ts";
+import {fetchCategoryListByType} from "@/api/category.ts";
+import {useNavigate} from "react-router-dom";
 
 function Setmeal() {
 
@@ -61,7 +62,7 @@ function Setmeal() {
         },
     ];
 
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCategoryOptions();
@@ -97,7 +98,7 @@ function Setmeal() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const response = await fetchCategoriesByType({type: CategoryType.SetMeal});
+            const response = await fetchCategoryListByType({type: CategoryType.SetMeal});
             console.log("category list response:", response);
             if (response.code === 1 && response.data) {
                 setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
@@ -109,7 +110,11 @@ function Setmeal() {
     }
 
     const handleAddSetmeal = () => {
+        navigate("/setmeal/add");
+    }
 
+    const handleEditSetmeal = (id: number) => {
+        navigate(`/setmeal/edit/${id}`);
     }
 
     const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null,
@@ -232,7 +237,7 @@ function Setmeal() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleEditEmployee(row.id)}
+                                            onClick={() => handleEditSetmeal(row.id)}
                                             color='secondary'
                                         >
                                             修改

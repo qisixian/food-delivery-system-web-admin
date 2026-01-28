@@ -8,9 +8,10 @@ import {
 import Button from "@mui/material/Button";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {queryDishById} from "@/api/dish.ts";
-import {fetchCategoriesByType} from "@/api/category.ts";
-import {CategoryType} from "@/constants";
+import {fetchDishById} from "@/api/dish.ts";
+import {fetchCategoryListByType} from "@/api/category.ts";
+import {CategoryType, Status} from "@/constants";
+import {ApiRequestBody} from "@/types";
 
 
 const labelWidth = 120;
@@ -22,24 +23,20 @@ function AddDish() {
     const { id } = useParams();
     const isEdit = Boolean(id);
 
-    type Form = {
-        id: string;
-        name: string;
+    type Form = Omit<ApiRequestBody<'/admin/dish', 'post'>, 'categoryId' | 'price'> & {
         categoryId: number | '';
         price: number | '',
-        flavors: unknown[],
-        image: string;
-        description: string;
-    };
+    }
 
     const [form, setForm] = useState<Form>({
-        id: "",
+        id: undefined,
         name: "",
         categoryId: "",
         price: "",
         flavors: [],
         image: "",
-        description: ""
+        description: "",
+        status: Status.Enabled
     });
 
     type Option = { value: string | number; label: string };
@@ -65,24 +62,26 @@ function AddDish() {
             if (v < 0) return "价格不能为负数";
             return undefined;
         },
-        flavors: () => undefined,
         image: () => undefined,
         description: () => undefined,
+        status: () => undefined,
+        flavors: () => undefined,
     } satisfies Validators<Form>;
 
     useEffect(() => {
         if(isEdit){
-            queryDishById({id: Number(id)}).then(res => {
+            fetchDishById({id: Number(id)}).then(res => {
                 if (res.code === 1 && res.data) {
                     console.log("Fetched dish data:", res);
                     setForm({
-                        id: String(id),
+                        id: Number(id),
                         name: res.data.name,
                         categoryId: res.data.categoryId,
                         price: res.data.price,
                         flavors: res.data.flavors,
                         image: res.data.image,
-                        description: res.data.description
+                        description: res.data.description,
+                        status: res.data.status
                     });
                 } else {
                     console.error("Failed to fetch dish data:", res.msg);
@@ -96,7 +95,7 @@ function AddDish() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const response = await fetchCategoriesByType({type: CategoryType.Dish});
+            const response = await fetchCategoryListByType({type: CategoryType.Dish});
             console.log("category list response:", response);
             if (response.code === 1 && response.data) {
                 setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));

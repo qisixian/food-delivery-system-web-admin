@@ -56,7 +56,7 @@ export const enableOrDisableCategory = (
   })
 }
 
-export const fetchCategoriesByType = (params: ApiQuery<'/admin/category/list', 'get'>) => {
+export const fetchCategoryListByType = (params: ApiQuery<'/admin/category/list', 'get'>) => {
   return request<ApiResponseData<'/admin/category/list', 'get'>, never, ApiQuery<'/admin/category/list', 'get'>>({
     url: '/admin/category/list',
     method: 'get',

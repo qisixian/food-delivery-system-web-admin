@@ -16,7 +16,7 @@ import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {changeDishStatus, fetchDishPage} from "@/api/dish.ts";
-import {fetchCategoriesByType} from "@/api/category.ts";
+import {fetchCategoryListByType} from "@/api/category.ts";
 import {CategoryType, Status} from "@/constants";
 
 function Dish() {
@@ -98,7 +98,7 @@ function Dish() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const response = await fetchCategoriesByType({type: CategoryType.Dish});
+            const response = await fetchCategoryListByType({type: CategoryType.Dish});
             console.log("category list response:", response);
             if (response.code === 1 && response.data) {
                 setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));

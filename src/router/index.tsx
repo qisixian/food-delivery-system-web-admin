@@ -11,6 +11,7 @@ import Category from "@/routes/Category.tsx";
 import Statistics from "@/routes/Statistics.tsx";
 import Order from "@/routes/Order.tsx";
 import AddDish from "@/routes/AddDish.tsx";
+import AddSetmeal from "@/routes/AddSetmeal.tsx";
 
 // import App from "@/App";
 // import RootErrorBoundary from "@/app/ErrorBoundary";
@@ -87,6 +88,14 @@ export const router = createBrowserRouter([
                     { path: "edit/:id", element: <AddDish /> },
                 ],
                 handle: { label: '添加菜品', hidden: true }
+            },
+            {
+                path: "setmeal",
+                children: [
+                    { path: "add", element: <AddSetmeal /> },
+                    { path: "edit/:id", element: <AddSetmeal /> },
+                ],
+                handle: { label: '添加套餐', hidden: true }
             }
             // { path: "users", element: <UserList /> },
         ],

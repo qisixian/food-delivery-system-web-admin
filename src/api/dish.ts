@@ -42,24 +42,15 @@ export const addDish = (params: ApiRequestBody<'/admin/dish', 'post'>) => {
 }
 
 // 查询详情
-export const queryDishById = (params: ApiPathParams<'/admin/dish/{id}', 'get'>) => {
+export const fetchDishById = (params: ApiPathParams<'/admin/dish/{id}', 'get'>) => {
   return request<ApiResponseData<'/admin/dish/{id}', 'get'>, never, never>({
     url: `/admin/dish/${params.id}`,
     method: 'get'
   })
 }
 
-// 获取菜品分类列表
-export const getCategoryList = (params: ApiQuery<'/admin/category/list', 'get'>) => {
-  return request<ApiResponseData<'/admin/category/list', 'get'>, never, ApiQuery<'/admin/category/list', 'get'>>({
-    url: '/admin/category/list',
-    method: 'get',
-    params
-  })
-}
-
 // 查菜品列表的接口
-export const queryDishList = (params: ApiQuery<'/admin/dish/list', 'get'>) => {
+export const fetchDishListByCategoryId = (params: ApiQuery<'/admin/dish/list', 'get'>) => {
   return request<ApiResponseData<'/admin/dish/list', 'get'>, never, ApiQuery<'/admin/dish/list', 'get'>>({
     url: '/admin/dish/list',
     method: 'get',
@@ -87,14 +78,5 @@ export const changeDishStatus = (
     url: `/admin/dish/status/${params.status}`,
     method: 'post',
     params: { id: params.id }
-  })
-}
-
-//菜品分类数据查询
-export const dishCategoryList = (params: ApiQuery<'/admin/category/list', 'get'>) => {
-  return request<ApiResponseData<'/admin/category/list', 'get'>, never, ApiQuery<'/admin/category/list', 'get'>>({
-    url: `/admin/category/list`,
-    method: 'get',
-    params: { ...params }
   })
 }

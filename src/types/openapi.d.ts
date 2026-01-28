@@ -817,14 +817,14 @@ export interface components {
             /** Format: int64 */
             id?: number;
             /** Format: int64 */
-            categoryId?: number;
-            name?: string;
-            price?: number;
+            categoryId: number;
+            name: string;
+            price: number;
             /** Format: int32 */
-            status?: number;
-            description?: string;
-            image?: string;
-            setmealDishes?: components["schemas"]["SetmealDish"][];
+            status: number;
+            description: string;
+            image: string;
+            setmealDishes: components["schemas"]["SetmealDish"][];
         };
         SetmealDish: {
             /** Format: int64 */
@@ -832,11 +832,11 @@ export interface components {
             /** Format: int64 */
             setmealId?: number;
             /** Format: int64 */
-            dishId?: number;
-            name?: string;
-            price?: number;
+            dishId: number;
+            name: string;
+            price: number;
             /** Format: int32 */
-            copies?: number;
+            copies: number;
         };
         EmployeeDTO: {
             /** Format: int64 */
@@ -853,15 +853,15 @@ export interface components {
         DishDTO: {
             /** Format: int64 */
             id?: number;
-            name?: string;
+            name: string;
             /** Format: int64 */
-            categoryId?: number;
-            price?: number;
-            image?: string;
-            description?: string;
+            categoryId: number;
+            price: number;
+            image: string;
+            description: string;
             /** Format: int32 */
-            status?: number;
-            flavors?: components["schemas"]["DishFlavor"][];
+            status: number;
+            flavors: components["schemas"]["DishFlavor"][];
         };
         DishFlavor: {
             /** Format: int64 */
@@ -875,10 +875,10 @@ export interface components {
             /** Format: int64 */
             id?: number;
             /** Format: int32 */
-            type?: number;
-            name?: string;
+            type: number;
+            name: string;
             /** Format: int32 */
-            sort?: number;
+            sort: number;
         };
         UserLoginDTO: {
             code?: string;
@@ -1106,19 +1106,19 @@ export interface components {
         };
         SetmealVO: {
             /** Format: int64 */
-            id?: number;
+            id: number;
             /** Format: int64 */
-            categoryId?: number;
-            name?: string;
-            price?: number;
+            categoryId: number;
+            name: string;
+            price: number;
             /** Format: int32 */
-            status?: number;
-            description?: string;
-            image?: string;
+            status: number;
+            description: string;
+            image: string;
             /** Format: date-time */
-            updateTime?: string;
-            categoryName?: string;
-            setmealDishes?: components["schemas"]["SetmealDish"][];
+            updateTime: string;
+            categoryName: string;
+            setmealDishes: components["schemas"]["SetmealDish"][];
         };
         SetmealPageQueryDTO: {
             /** Format: int32 */
@@ -1237,15 +1237,15 @@ export interface components {
         };
         Dish: {
             /** Format: int64 */
-            id?: number;
-            name?: string;
+            id: number;
+            name: string;
             /** Format: int64 */
             categoryId?: number;
-            price?: number;
+            price: number;
             image?: string;
             description?: string;
             /** Format: int32 */
-            status?: number;
+            status: number;
             /** Format: date-time */
             createTime?: string;
             /** Format: date-time */
