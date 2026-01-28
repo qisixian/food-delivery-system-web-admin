@@ -106,6 +106,8 @@ function Employee() {
             console.log("Enable/Disable employee response:", response);
             if (response.code === 1) {
                 pageQuery();
+            } else{
+                console.log("Failed to enable/disable employee:", response.msg);
             }
         } catch (error) {
             console.error("Failed to enable/disable employee:", error);

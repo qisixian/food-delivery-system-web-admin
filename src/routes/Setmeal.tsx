@@ -14,7 +14,7 @@ import {
 import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {fetchSetmealPage} from "@/api/setMeal.ts";
+import {deleteSetmeal, enableOrDisableSetmeal, fetchSetmealPage} from "@/api/setMeal.ts";
 import {CategoryType, Status} from "@/constants";
 import {fetchCategoryListByType} from "@/api/category.ts";
 import {useNavigate} from "react-router-dom";
@@ -109,12 +109,40 @@ function Setmeal() {
         }
     }
 
+    const handleStartOrStop = async (id: number, status: number) => {
+        try {
+            const response = await enableOrDisableSetmeal({id, status});
+            console.log("Enable/Disable setmeal response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            } else{
+                console.log("Failed to enable/disable setmeal:", response.msg);
+            }
+        } catch (error) {
+            console.error("Failed to enable/disable setmeal:", error);
+        }
+    }
+
     const handleAddSetmeal = () => {
         navigate("/setmeal/add");
     }
 
     const handleEditSetmeal = (id: number) => {
         navigate(`/setmeal/edit/${id}`);
+    }
+
+    const handleDeleteSetmeal = async (id: number) => {
+        try {
+            const response = await deleteSetmeal({ids: [id]});
+            console.log("Delete setmeal response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            } else {
+                console.log("Failed to delete setmeal:", response.msg);
+            }
+        } catch (error) {
+            console.error("Failed to delete setmeal:", error);
+        }
     }
 
     const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null,
@@ -245,7 +273,7 @@ function Setmeal() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleEditEmployee(row.id)}
+                                            onClick={() => handleDeleteSetmeal(row.id)}
                                             color='error'
                                         >
                                             删除
@@ -253,7 +281,7 @@ function Setmeal() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
+                                            onClick={() => handleStartOrStop(row.id, row.status === Status.Enabled? Status.Disabled: Status.Enabled)}
                                             color={row.status === 0? 'secondary': 'error'}
                                         >
                                             {row.status === 0? '起售': '停售'}

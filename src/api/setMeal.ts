@@ -51,7 +51,7 @@ export const querySetmealById = (params: ApiPathParams<'/admin/setmeal/{id}', 'g
 }
 
 // 批量起售禁售
-export const setmealStatusByStatus = (
+export const enableOrDisableSetmeal = (
     params: ApiQuery<'/admin/dish/status/{status}', 'post'> &
         ApiPathParams<'/admin/dish/status/{status}', 'post'>) => {
   return request<ApiResponseData<'/admin/dish/status/{status}', 'post'>, never, ApiQuery<'/admin/dish/status/{status}', 'post'>>({

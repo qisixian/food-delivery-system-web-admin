@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig, AxiosResponse} from 'axios'
 import { store } from "@/store";
 import {logout} from "@/services/authService.ts";
 import {ApiResponse} from "@/types";
+import { enqueueSnackbar } from 'notistack'
+
 
 
 export const http = axios.create({
@@ -27,7 +29,12 @@ http.interceptors.request.use(
 
 // do just after receiving response
 http.interceptors.response.use(
-    (res: AxiosResponse) => res.data,
+    (res: AxiosResponse) => {
+        if (res.data.code !== 1) {
+            enqueueSnackbar(res.data.msg, { variant: "error" });
+        }
+        return res.data;
+    },
     // (error: AxiosError) => {
     (error) => {
         if (error.response.data.status === 401 || error.status === 401) logout();
