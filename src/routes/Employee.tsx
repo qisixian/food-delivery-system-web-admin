@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import {
     Box,
-    Paper,
+    Paper, Stack,
     Table,
     TableBody,
     TableCell,
@@ -11,7 +11,6 @@ import {
     TableRow
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {
@@ -20,6 +19,7 @@ import {
 } from "@/api/employee";
 import {useNavigate} from "react-router-dom";
 import {Status} from "@/constants";
+import {ApiResponseData} from "@/types";
 
 
 function Employee() {
@@ -28,22 +28,12 @@ function Employee() {
         name: ""
     });
 
-    type Employee = {
-        id: number;
-        username: string;
-        name: string;
-        phone: string;
-        sex: string;
-        idNumber: string;
-        status: number;
-        updateTime: string;
-    }
-
     type PageState = {
         page: number;
         pageSize: number;
         total: number;
-        rows: Employee[];
+        // rows: Employee[];
+        rows: ApiResponseData<'/admin/employee/page','get'>['records'];
     };
 
     const [pageState, setPageState] = useState<PageState>({
@@ -125,89 +115,94 @@ function Employee() {
     return (
         <>
 
-            <Paper sx={{ p: 2, mb: 2 }}>
-            <Toolbar disableGutters
-                     sx={{ mb: 2, gap: 2 }}
-            >
-                <Typography>
-                    员工姓名：
-                </Typography>
-                <TextField
-                    size="small"
-                    placeholder="按员工姓名查询"
-                    onChange={(e) =>
-                       setForm((prev) =>
-                           ({ ...prev, name: e.target.value }))}
-                />
-                <Button variant="contained" onClick={pageQuery}>查询</Button>
+            <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ mb: 2, mt: 1, flexWrap: 'wrap' }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            员工姓名：
+                        </Typography>
+                        <TextField
+                            size="small"
+                            placeholder="按员工姓名查询"
+                            onChange={(e) =>
+                               setForm((prev) =>
+                                   ({ ...prev, name: e.target.value }))}
+                        />
+                    </Stack>
+                    <Button variant="contained" onClick={pageQuery}>查询</Button>
 
-                <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
 
-                <Button variant="contained" onClick={handleAddEmployee}>+ 添加员工</Button>
-            </Toolbar>
+                    <Button variant="contained" onClick={handleAddEmployee}>+ 添加员工</Button>
+                </Stack>
 
-            <TableContainer component={Paper} elevation={0}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>员工姓名</TableCell>
-                            <TableCell align="left">账号</TableCell>
-                            <TableCell align="left">手机号</TableCell>
-                            <TableCell align="left">账号状态</TableCell>
-                            <TableCell align="left">最后操作时间</TableCell>
-                            <TableCell align="center">操作</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {pageState.rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {row.name}
-                                </TableCell>
-                                <TableCell align="left">{row.username}</TableCell>
-                                <TableCell align="left">{row.phone}</TableCell>
-                                <TableCell align="left">{row.status === Status.Enabled? '✅ 启用': '🚫 禁用'}</TableCell>
-                                <TableCell align="left">{row.updateTime}</TableCell>
-                                <TableCell align="center">
-                                    <Button
-                                        variant="text"
-                                        sx={{p: 0}}
-                                        onClick={() => handleEditEmployee(row.id)}
-                                        color='secondary'
-                                        disabled={row.username === 'admin'}
-                                    >
-                                        修改
-                                    </Button>
-                                    <Button
-                                        variant="text"
-                                        sx={{p: 0}}
-                                        onClick={() => handleStartOrStop(row.id, row.status === Status.Enabled? Status.Disabled: Status.Enabled)}
-                                        color={row.status === Status.Enabled? 'error': 'secondary'}
-                                        disabled={row.username === 'admin'}
-                                    >
-                                        {row.status === Status.Enabled? '禁用': '启用'}
-                                    </Button>
-                                </TableCell>
+                <TableContainer component={Paper} elevation={0}>
+                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>员工姓名</TableCell>
+                                <TableCell align="left">账号</TableCell>
+                                <TableCell align="left">手机号</TableCell>
+                                <TableCell align="left">账号状态</TableCell>
+                                <TableCell align="left">最后操作时间</TableCell>
+                                <TableCell align="center">操作</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={pageState.total}
-                rowsPerPage={pageState.pageSize}
-                page={pageState.page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+                        </TableHead>
+                        <TableBody>
+                            {pageState.rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell align="left">{row.username}</TableCell>
+                                    <TableCell align="left">{row.phone}</TableCell>
+                                    <TableCell align="left">{row.status === Status.Enabled? '✅ 启用': '🚫 禁用'}</TableCell>
+                                    <TableCell align="left">{row.updateTime}</TableCell>
+                                    <TableCell align="center">
+                                        <Button
+                                            variant="text"
+                                            sx={{p: 0}}
+                                            onClick={() => handleEditEmployee(row.id)}
+                                            color='secondary'
+                                            disabled={row.username === 'admin'}
+                                        >
+                                            修改
+                                        </Button>
+                                        <Button
+                                            variant="text"
+                                            sx={{p: 0}}
+                                            onClick={() => handleStartOrStop(row.id, row.status === Status.Enabled? Status.Disabled: Status.Enabled)}
+                                            color={row.status === Status.Enabled? 'error': 'secondary'}
+                                            disabled={row.username === 'admin'}
+                                        >
+                                            {row.status === Status.Enabled? '禁用': '启用'}
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={pageState.total}
+                    rowsPerPage={pageState.pageSize}
+                    page={pageState.page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
             </Paper>
         </>
     )
 }
 
-export default Employee
+export default Employee;

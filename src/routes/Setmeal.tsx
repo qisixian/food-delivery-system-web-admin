@@ -2,7 +2,7 @@ import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {
     Box, MenuItem,
-    Paper,
+    Paper, Stack,
     Table,
     TableBody,
     TableCell,
@@ -11,13 +11,13 @@ import {
     TablePagination,
     TableRow
 } from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import {deleteSetmeal, enableOrDisableSetmeal, fetchSetmealPage} from "@/api/setMeal.ts";
 import {CategoryType, Status} from "@/constants";
 import {fetchCategoryListByType} from "@/api/category.ts";
 import {useNavigate} from "react-router-dom";
+import {ApiResponseData} from "@/types";
 
 function Setmeal() {
 
@@ -31,13 +31,11 @@ function Setmeal() {
         status: ''
     });
 
-
-
     type PageState = {
         page: number;
         pageSize: number;
         total: number;
-        rows: any[];
+        rows: ApiResponseData<'/admin/setmeal/page','get'>['records'];
     };
 
     const [pageState, setPageState] = useState<PageState>({
@@ -101,7 +99,10 @@ function Setmeal() {
             const response = await fetchCategoryListByType({type: CategoryType.SetMeal});
             console.log("category list response:", response);
             if (response.code === 1 && response.data) {
-                setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
+                setCategoryOptions(response.data.map((x: ApiResponseData<'/admin/category/list', 'get'>[0]) => ({
+                    value: String(x.id),
+                    label: String(x.name)
+                })));
                 // console.log("pageState.rows:", pageState.rows);
             }
         } catch (error) {
@@ -167,72 +168,81 @@ function Setmeal() {
     return (
         <>
 
-            <Paper sx={{ p: 2, mb: 2 }}>
-                <Toolbar disableGutters
-                         sx={{ mb: 2, gap: 2 }}
+            <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ mb: 2, mt: 1, flexWrap: 'wrap' }}
                 >
-                    <Typography>
-                        套餐名称：
-                    </Typography>
-                    <TextField
-                        size="small"
-                        placeholder="按套餐名称查询"
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev, name: e.target.value }))}
-                    />
-                    <Typography>
-                        套餐分类：
-                    </Typography>
-                    <TextField
-                        select
-                        size="small"
-                        sx={{ minWidth: 120 }}
-                        value={form.categoryId}
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev,
-                                    categoryId: e.target.value === '' ? '' : Number(e.target.value),
-                                }))}
-                    >
-                        {categoryOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            套餐名称：
+                        </Typography>
+                        <TextField
+                            size="small"
+                            placeholder="按套餐名称查询"
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev, name: e.target.value }))}
+                        />
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            套餐分类：
+                        </Typography>
+                        <TextField
+                            select
+                            size="small"
+                            sx={{ minWidth: 120 }}
+                            value={form.categoryId}
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev,
+                                        categoryId: e.target.value === '' ? '' : Number(e.target.value),
+                                    }))}
+                        >
+                            {categoryOptions.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                            <MenuItem key="" value="">
+                                全部
                             </MenuItem>
-                        ))}
-                        <MenuItem key="" value="">
-                            全部
-                        </MenuItem>
-                    </TextField>
-                    <Typography>
-                        售卖状态：
-                    </Typography>
-                    <TextField
-                        sx={{ minWidth: 120 }}
-                        size="small"
-                        select
-                        value={form.status}
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev,
-                                    status: e.target.value === '' ? '' : Number(e.target.value),
-                                }))}
-                    >
-                        {saleStatus.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                        </TextField>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            售卖状态：
+                        </Typography>
+                        <TextField
+                            sx={{ minWidth: 120 }}
+                            size="small"
+                            select
+                            value={form.status}
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev,
+                                        status: e.target.value === '' ? '' : Number(e.target.value),
+                                    }))}
+                        >
+                            {saleStatus.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                            <MenuItem key="" value="">
+                                全部
                             </MenuItem>
-                        ))}
-                        <MenuItem key="" value="">
-                            全部
-                        </MenuItem>
-                    </TextField>
+                        </TextField>
+                    </Stack>
                     <Button variant="contained" onClick={pageQuery}>查询</Button>
 
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Button variant="contained" onClick={handleAddSetmeal}>+ 添加套餐</Button>
-                </Toolbar>
+                </Stack>
 
                 <TableContainer component={Paper} elevation={0}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">

@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography";
 import {
     Box, MenuItem,
-    Paper,
+    Paper, Stack,
     Table,
     TableBody,
     TableCell,
@@ -10,14 +10,14 @@ import {
     TablePagination,
     TableRow
 } from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {changeDishStatus, fetchDishPage} from "@/api/dish.ts";
+import {changeDishStatus, deleteDish, fetchDishPage} from "@/api/dish.ts";
 import {fetchCategoryListByType} from "@/api/category.ts";
 import {CategoryType, Status} from "@/constants";
+import {ApiResponseData} from "@/types";
 
 function Dish() {
 
@@ -35,7 +35,7 @@ function Dish() {
         page: number;
         pageSize: number;
         total: number;
-        rows: any[];
+        rows: ApiResponseData<'/admin/dish/page','get'>['records'];
     };
 
     const [pageState, setPageState] = useState<PageState>({
@@ -101,7 +101,10 @@ function Dish() {
             const response = await fetchCategoryListByType({type: CategoryType.Dish});
             console.log("category list response:", response);
             if (response.code === 1 && response.data) {
-                setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
+                setCategoryOptions(response.data.map((x: ApiResponseData<'/admin/category/list', 'get'>[0]) => ({
+                    value: String(x.id),
+                    label: String(x.name)
+                })));
                 // console.log("pageState.rows:", pageState.rows);
             }
         } catch (error) {
@@ -117,7 +120,19 @@ function Dish() {
         navigate(`/dish/edit/${id}`);
     }
 
-    // const handleDeleteDish = () => {}
+    const handleDeleteDish = async (id: number) => {
+        try {
+            const response = await deleteDish({ids: [id]});
+            console.log("Delete dish response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            } else {
+                console.log("Failed to delete dish:", response.msg);
+            }
+        } catch (error) {
+            console.error("Failed to delete dish:", error);
+        }
+    }
 
     const handleChangeDishStatus = async (id: number, status: number) => {
         try {
@@ -152,72 +167,81 @@ function Dish() {
     return (
         <>
 
-            <Paper sx={{ p: 2, mb: 2 }}>
-                <Toolbar disableGutters
-                         sx={{ mb: 2, gap: 2 }}
+            <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ mb: 2, mt: 1, flexWrap: 'wrap' }}
                 >
-                    <Typography>
-                        菜品名称：
-                    </Typography>
-                    <TextField
-                        size="small"
-                        placeholder="按菜品名称查询"
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev, name: e.target.value }))}
-                    />
-                    <Typography>
-                        菜品分类：
-                    </Typography>
-                    <TextField
-                        select
-                        size="small"
-                        sx={{ minWidth: 120 }}
-                        value={form.categoryId}
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev,
-                                    categoryId: e.target.value === '' ? '' : Number(e.target.value)
-                                }))}
-                    >
-                        {categoryOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            菜品名称：
+                        </Typography>
+                        <TextField
+                            size="small"
+                            placeholder="按菜品名称查询"
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev, name: e.target.value }))}
+                        />
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            菜品分类：
+                        </Typography>
+                        <TextField
+                            select
+                            size="small"
+                            sx={{ minWidth: 120 }}
+                            value={form.categoryId}
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev,
+                                        categoryId: e.target.value === '' ? '' : Number(e.target.value)
+                                    }))}
+                        >
+                            {categoryOptions.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                            <MenuItem key="" value="">
+                                全部
                             </MenuItem>
-                        ))}
-                        <MenuItem key="" value="">
-                            全部
-                        </MenuItem>
-                    </TextField>
-                    <Typography>
-                        售卖状态：
-                    </Typography>
-                    <TextField
-                        sx={{ minWidth: 120 }}
-                        size="small"
-                        select
-                        value={form.status}
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev,
-                                    status: e.target.value === '' ? '' : Number(e.target.value)
-                                }))}
-                    >
-                        {saleStatus.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                        </TextField>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            售卖状态：
+                        </Typography>
+                        <TextField
+                            sx={{ minWidth: 120 }}
+                            size="small"
+                            select
+                            value={form.status}
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev,
+                                        status: e.target.value === '' ? '' : Number(e.target.value)
+                                    }))}
+                        >
+                            {saleStatus.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                            <MenuItem key="" value="">
+                                全部
                             </MenuItem>
-                        ))}
-                        <MenuItem key="" value="">
-                            全部
-                        </MenuItem>
-                    </TextField>
+                        </TextField>
+                    </Stack>
                     <Button variant="contained" onClick={pageQuery}>查询</Button>
 
                     <Box sx={{ flexGrow: 1 }} />
 
                     <Button variant="contained" onClick={handleAddDish}>+ 添加菜品</Button>
-                </Toolbar>
+                </Stack>
 
                 <TableContainer component={Paper} elevation={0}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -258,7 +282,7 @@ function Dish() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleEditEmployee(row.id)}
+                                            onClick={() => handleDeleteDish(row.id)}
                                             color='error'
                                         >
                                             删除

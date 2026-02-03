@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import AdminLayout from "@/layouts/AdminLayout";
 import Login from "@/routes/Login.tsx";
-import LoginTest from "@/routes/loginTest.tsx";
 import Dashboard from "@/routes/Dashboard";
 import Employee from "@/routes/Employee";
 import AddEmployee from "@/routes/AddEmployee.tsx";
@@ -12,6 +11,7 @@ import Statistics from "@/routes/Statistics.tsx";
 import Order from "@/routes/Order.tsx";
 import AddDish from "@/routes/AddDish.tsx";
 import AddSetmeal from "@/routes/AddSetmeal.tsx";
+import AddCategory from "@/routes/AddCategory.tsx";
 
 // import App from "@/App";
 // import RootErrorBoundary from "@/app/ErrorBoundary";
@@ -68,11 +68,11 @@ export const router = createBrowserRouter([
                 element: <Employee />,
                 handle: { label: '员工管理', icon: "employee" }
             },
-            {
-                path: "login-test",
-                element: <LoginTest />,
-                handle: { label: '登录测试', icon: "test" }
-            },
+            // {
+            //     path: "login-test",
+            //     element: <LoginTest />,
+            //     handle: { label: '登录测试', icon: "test" }
+            // },
             {
                 path: "employee",
                 children: [
@@ -96,8 +96,15 @@ export const router = createBrowserRouter([
                     { path: "edit/:id", element: <AddSetmeal /> },
                 ],
                 handle: { label: '添加套餐', hidden: true }
+            },
+            {
+                path: "category",
+                children: [
+                    { path: "add", element: <AddCategory /> },
+                    { path: "edit/:id", element: <AddCategory /> },
+                ],
+                handle: { label: '添加分类', hidden: true }
             }
-            // { path: "users", element: <UserList /> },
         ],
         // ErrorBoundary: RootErrorBoundary,
     },

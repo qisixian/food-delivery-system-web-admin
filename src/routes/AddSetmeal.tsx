@@ -11,7 +11,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {fetchCategoryListByType} from "@/api/category.ts";
 import {CategoryType, Status} from "@/constants";
-import {ApiRequestBody} from "@/types";
+import {ApiRequestBody, ApiResponseData} from "@/types";
 import {addSetmeal, editSetmeal, querySetmealById} from "@/api/setMeal.ts";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -35,6 +35,7 @@ function AddSetmeal() {
 
     type Form = Omit<ApiRequestBody<'/admin/setmeal', 'post'>, 'categoryId' | 'price'> & {
         categoryId: number | '';
+        // todo: better to change type to string and parse to number when submit
         price: number | '';
     }
 
@@ -108,7 +109,10 @@ function AddSetmeal() {
             const response = await fetchCategoryListByType({type: CategoryType.SetMeal});
             console.log("category list response:", response);
             if (response.code === 1 && response.data) {
-                setCategoryOptions(response.data.map((x: any) => ({ value: x.id, label: x.name })));
+                setCategoryOptions(response.data.map((x: ApiResponseData<'/admin/category/list', 'get'>[0]) => ({
+                    value: String(x.id),
+                    label: String(x.name)
+                })));
                 // console.log("pageState.rows:", pageState.rows);
             }
         } catch (error) {
@@ -119,6 +123,7 @@ function AddSetmeal() {
     const handleCancel = () => {
         navigate(-1);
     }
+
     const handleSubmit = async () => {
         // validate errors
         const nextErrors: Errors = {
@@ -340,10 +345,17 @@ function AddSetmeal() {
                         <TextField
                             variant="standard"
                             value={form.price}
-                            onChange={(e) =>
-                                setForm((prev) =>
-                                    ({...prev, price: Number(e.target.value)}))
-                            }
+                            onChange={(e) => {
+                                const raw = e.target.value;
+                                if (raw === "") {
+                                    setForm(prev => ({ ...prev, price: "" }));
+                                    return;
+                                }
+                                const n = Number(raw);
+                                if (!Number.isNaN(n)) {
+                                    setForm(prev => ({ ...prev, price: n }));
+                                }
+                            }}
                             onBlur={() => {
                                 setErrors((p) => ({
                                     ...p, price: validators.price(form.price)

@@ -2,7 +2,7 @@ import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {
     Box, MenuItem,
-    Paper,
+    Paper, Stack,
     Table,
     TableBody,
     TableCell,
@@ -11,11 +11,12 @@ import {
     TablePagination,
     TableRow
 } from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {fetchCategoryPage} from "@/api/category.ts";
+import {deleteCategory, enableOrDisableCategory, fetchCategoryPage} from "@/api/category.ts";
 import {CategoryType, Status} from "@/constants";
+import {useNavigate} from "react-router-dom";
+import {ApiResponseData} from "@/types";
 
 function Category() {
 
@@ -31,7 +32,7 @@ function Category() {
         page: number;
         pageSize: number;
         total: number;
-        rows: any[];
+        rows: ApiResponseData<'/admin/category/page','get'>['records'];
     };
 
     const [pageState, setPageState] = useState<PageState>({
@@ -54,7 +55,7 @@ function Category() {
         },
     ];
 
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         pageQuery();
@@ -83,8 +84,40 @@ function Category() {
         }
     }
 
-    const handleAdd = () => {
+    const handleAddCategory = (type: number) => {
+        navigate(`/category/add?type=${type}`);
+    }
 
+    const handleEditCategory = (category: ApiResponseData<'/admin/category/page','get'>['records'][0]) => {
+        // TODO: Do not concatenate category.name directly into the URL.
+        // It may break when containing spaces or '&'. Use encodeURIComponent or URLSearchParams.
+        navigate(`/category/edit/${category.id}?type=${category.type}&name=${category.name}&sort=${category.sort}`);
+    }
+
+    const handleDeleteCategory = async (id: number) => {
+        try {
+            const response = await deleteCategory({id: id});
+            console.log("Delete category response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            } else {
+                console.log("Failed to category dish:", response.msg);
+            }
+        } catch (error) {
+            console.error("Failed to category dish:", error);
+        }
+    }
+
+    const handleChangeCategoryStatus = async (id: number, status: number) => {
+        try {
+            const response = await enableOrDisableCategory({id, status});
+            console.log("change category status response:", response);
+            if (response.code === 1) {
+                pageQuery();
+            }
+        } catch (error) {
+            console.error("Failed to change category status:", error);
+        }
     }
 
     const handleChangePage = (_: React.MouseEvent<HTMLButtonElement> | null,
@@ -108,50 +141,57 @@ function Category() {
     return (
         <>
 
-            <Paper sx={{ p: 2, mb: 2 }}>
-                <Toolbar disableGutters
-                         sx={{ mb: 2, gap: 2 }}
+            <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ mb: 2, mt: 1, flexWrap: 'wrap' }}
                 >
-                    <Typography>
-                        分类名称：
-                    </Typography>
-                    <TextField
-                        size="small"
-                        placeholder="按分类名称查询"
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev, name: e.target.value }))}
-                    />
-                    <Typography>
-                        分类类型：
-                    </Typography>
-                    <TextField
-                        sx={{ minWidth: 120 }}
-                        size="small"
-                        select
-                        value={form.type}
-                        onChange={(e) =>
-                            setForm((prev) =>
-                                ({ ...prev,
-                                    type: e.target.value === '' ? '' : Number(e.target.value),
-                                }))}
-                    >
-                        {categoryTypes.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            分类名称：
+                        </Typography>
+                        <TextField
+                            size="small"
+                            placeholder="按分类名称查询"
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev, name: e.target.value }))}
+                        />
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography>
+                            分类类型：
+                        </Typography>
+                        <TextField
+                            sx={{ minWidth: 120 }}
+                            size="small"
+                            select
+                            value={form.type}
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    ({ ...prev,
+                                        type: e.target.value === '' ? '' : Number(e.target.value),
+                                    }))}
+                        >
+                            {categoryTypes.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                            <MenuItem key="" value="">
+                                全部
                             </MenuItem>
-                        ))}
-                        <MenuItem key="" value="">
-                            全部
-                        </MenuItem>
-                    </TextField>
+                        </TextField>
+                    </Stack>
                     <Button variant="contained" onClick={pageQuery}>查询</Button>
 
                     <Box sx={{ flexGrow: 1 }} />
 
-                    <Button variant="contained" onClick={handleAdd}>+ 添加菜品分类</Button>
-                    <Button variant="contained" onClick={handleAdd}>+ 添加套餐分类</Button>
-                </Toolbar>
+                    <Button variant="contained" onClick={()=> handleAddCategory(CategoryType.Dish)}>+ 添加菜品分类</Button>
+                    <Button variant="contained" onClick={()=> handleAddCategory(CategoryType.SetMeal)}>+ 添加套餐分类</Button>
+                </Stack>
 
                 <TableContainer component={Paper} elevation={0}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -182,7 +222,7 @@ function Category() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleEditEmployee(row.id)}
+                                            onClick={() => handleEditCategory(row)}
                                             color='secondary'
                                         >
                                             修改
@@ -190,7 +230,7 @@ function Category() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleEditEmployee(row.id)}
+                                            onClick={() => handleDeleteCategory(Number(row.id))}
                                             color='error'
                                         >
                                             删除
@@ -198,7 +238,7 @@ function Category() {
                                         <Button
                                             variant="text"
                                             sx={{p: 0}}
-                                            // onClick={() => handleStartOrStop(row.id, row.status === 0? 1: 0)}
+                                            onClick={() => handleChangeCategoryStatus(Number(row.id), row.status === 0? 1: 0)}
                                             color={row.status === Status.Enabled? 'error': 'secondary'}
                                         >
                                             {row.status === Status.Enabled? '禁用': '启用'}

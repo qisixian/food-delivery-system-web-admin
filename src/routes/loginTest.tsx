@@ -29,4 +29,4 @@ function LoginTest() {
     )
 }
 
-export default LoginTest
+export default LoginTest;

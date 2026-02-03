@@ -11,15 +11,19 @@ import { router } from "@/router";
 // import App from './App.tsx'
 import './index.css'
 import {GlobalSnackbarProvider} from "@/providers/GlobalSnackbarProvider.tsx";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <Provider store={store}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <GlobalSnackbarProvider>
-                    <RouterProvider router={router} />
-                </GlobalSnackbarProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <GlobalSnackbarProvider>
+                        <RouterProvider router={router} />
+                    </GlobalSnackbarProvider>
+                </LocalizationProvider>
             </ThemeProvider>
         </Provider>
     </StrictMode>
